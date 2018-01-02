@@ -3,16 +3,20 @@ import { NgModule } from '@angular/core';
 
 
 import { AppComponent } from './app.component';
+import { KubeaComponent } from './kubea/kubea.component';
+import { KubeaService } from './kubea.service';
+import { MessageService } from './message.service';
 
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    KubeaComponent
   ],
   imports: [
     BrowserModule
   ],
-  providers: [],
+  providers: [KubeaService, MessageService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
