@@ -1,5 +1,11 @@
 # Wnfportal
 
+Web-Oberfläche für wnfKontakt und wnfKuB
+
+Zugriff über node-firebird auf die Datenbanken
+
+    sudo npm install node-firebird
+
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.6.2.
 
 ## Development server
