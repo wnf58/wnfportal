@@ -16,15 +16,15 @@ export class KubeaComponent implements OnInit {
   constructor(private kubeaService: KubeaService) { }
 
   ngOnInit() {
-    this.getKubEA();
+    this.getKubEARecords();
   }
 
   onSelect(kubea: KubeaRecord): void {
     this.selectedKubEA = kubea;
   }
 
-  getKubEA(): void {
-    this.kubeaService.getKubEA()
+  getKubEARecords(): void {
+    this.kubeaService.getKubEARecords()
         .subscribe(kubea => this.kubeaRecords = kubea);
   }
 

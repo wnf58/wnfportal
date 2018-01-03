@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-
+import { HttpClientModule } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 import { KubeaComponent } from './kubea/kubea.component';
@@ -14,7 +14,8 @@ import { MessageService } from './message.service';
     KubeaComponent
   ],
   imports: [
-    BrowserModule
+    BrowserModule,
+    HttpClientModule
   ],
   providers: [KubeaService, MessageService],
   bootstrap: [AppComponent]
