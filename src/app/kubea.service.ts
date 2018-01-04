@@ -18,7 +18,7 @@ export class KubeaService {
   // private kubeaUrl = 'api/kubea';  // URL to web api
   //No 'Access-Control-Allow-Origin' header is present
   //private kubeaUrl = 'http://c2016.fritz.box:8081/kontostandLetzterMonat'
-  private kubeaUrl = 'http://localhost:8081/jsonListEA'
+  private kubeaUrl = 'http://c2016.fritz.box:8081/jsonListEA'
 
   constructor(
     private http: HttpClient,

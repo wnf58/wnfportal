@@ -1,13 +1,16 @@
 <h2>Einnahmen/Ausgaben</h2>
 
 <table class="kubeaRecords">
+  <tr>
+    <th>Datum</th>
+    <th>Bezeichnung</th>
+    <th>Betrag</th>
+  </tr>
   <tr *ngFor="let kubea of kubeaRecords"
     [class.selected]="kubea === selectedKubEA"
     (click)="onSelect(kubea)">
-    <td>{{kubea.id}}</td>
+    <td>{{kubea.datum | date: 'dd.MM.yy'}}</td>
     <td>{{kubea.kurz}}</td>
-    <td>{{kubea.bez}}</td>
-    <td>{{kubea.datum | date: 'dd.MM.yyyy'}}</td>
-    <td>{{kubea.betrag}}</td>
+    <td class="wnfDM">{{kubea.betrag}}</td>
   </tr>
 </table>

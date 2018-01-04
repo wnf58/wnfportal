@@ -174,7 +174,7 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
            'datum': str(row[1]),
            'kurz': row[2],
            'bez': row[3],
-           'betrag': str(row[4])}
+           'betrag': T.sDM(row[4])}
       print(k)
       ea.append(k)
     return ea

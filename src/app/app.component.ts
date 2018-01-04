@@ -6,5 +6,5 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'wnfPortal 0.1';
+  title = 'wnfPortal 0.2';
 }
