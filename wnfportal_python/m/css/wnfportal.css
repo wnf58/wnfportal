@@ -1,0 +1,14 @@
+/* Tabelle in der Tabelle */
+.table-left {
+   width: 60%;
+   float: left;
+}
+.table-right {
+   width: 40%;
+   float: right;
+}
+.table-right-currency {
+   width: 40%;
+   float: right;
+   text-align: right;
+}

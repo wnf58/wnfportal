@@ -1,0 +1,55 @@
+/* Globals */
+/* Font
+-----------------------------------------------------------------------------------------------------------*/
+html {
+	font-size: 100%;
+}
+body,
+input,
+select,
+textarea,
+button,
+table {
+	font-size: 26px;
+	line-height: 1.3;
+	font-family: sans-serif /*{global-font-family}*/;
+}
+
+table {
+    width: 100%;
+	border: 1px solid black;
+	border-collapse: separate;
+	border-spacing: 10px;
+	margin-bottom: 2em;
+	/* Abstand zur nächsten Tabelle */
+}
+
+/* Tabelle in der Tabelle */
+.table-left {
+   width: 50%;
+   text-align: left;
+}
+.table-right {
+   width: 50%;
+}
+.table-right-currency {
+   width: 50%;
+   text-align: right;
+   vertical-align: top;
+}
+
+.table-3c-spalte1 {
+   width: 10%;
+   text-align: left;
+   vertical-align: top;
+}
+.table-3c-spalte2 {
+   width: 70%;
+   text-align: left;
+   vertical-align: top;
+}
+.table-3c-spalte3 {
+   width: 20%;
+   text-align: right;
+   vertical-align: top;
+}

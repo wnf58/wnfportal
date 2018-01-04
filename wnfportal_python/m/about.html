@@ -1,0 +1,50 @@
+<!-- page About-Dialog -->
+<div data-role="page" data-theme="c" id="wnfportal-about" data-add-back-btn="true">
+   <style>
+      @media all and (max-width: 25em) {
+         .my-breakpoint .ui-block-a, .my-breakpoint .ui-block-b {
+            width: 100%;
+            float: none;
+         }
+      }
+
+      @media all and (min-width: 25em) {
+         .my-breakpoint.ui-grid-a .ui-block-a {
+            width: 22%;
+         }
+         .my-breakpoint.ui-grid-a .ui-block-b {
+            width: 77%;
+         }
+      }
+   </style>
+
+   <!-- Header -->
+   <div data-role="header">
+      <h1>About wnfPortal</h1>
+   </div>
+   <!-- /header -->
+
+   <!-- Content -->
+   <div data-role="content">
+      <h3>wnfPortal Web-App</h3>
+      <div class="ui-grid-a my-breakpoint">
+         <div class="ui-block-a">
+            <img src="img/wlsoft.png" />
+         </div>
+
+         <div class="ui-block-b">
+            entwickelt mit jQuery Mobile und HTML5.
+            <br />
+            Zugriff auf Datenbanken wnfKontakt und wnfKuB
+            <br />
+            <br />
+            Version 09.2014
+            <br />
+            <br />
+            (c) <a href="http://www.wlsoft.de">wlsoft.de</a>
+         </div>
+      </div>
+   </div>
+   <!-- /Content -->
+</div>
+<!-- /page -->

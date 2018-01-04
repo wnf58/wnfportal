@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>wnfPortal</title>
+        <meta charset="UTF-8">
+
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+
+        <link rel="apple-touch-startup-image" href="img/wnfPortal.png" />
+
+        <link rel="stylesheet" href="css/jquery.mobile-1.4.5.css" />
+        <link rel="stylesheet" href="css/wnfportal.css"/>
+        
+
+<link rel="shortcut icon" href="/favicon.ico">
+<link rel="apple-touch-icon" sizes="57x57" href="/img/apple-touch-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="114x114" href="/img/apple-touch-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="72x72" href="/img/apple-touch-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="144x144" href="/img/apple-touch-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="60x60" href="/img/apple-touch-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/img/apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/img/apple-touch-icon-152x152.png">
+<link rel="icon" type="image/png" href="/img/favicon-196x196.png" sizes="196x196">
+<link rel="icon" type="image/png" href="/img/favicon-160x160.png" sizes="160x160">
+<link rel="icon" type="image/png" href="/img/favicon-96x96.png" sizes="96x96">
+<link rel="icon" type="image/png" href="/img/favicon-16x16.png" sizes="16x16">
+<link rel="icon" type="image/png" href="/img/favicon-32x32.png" sizes="32x32">
+        
+        
+        <script type="text/javascript" src="js/jquery.js"></script>
+        <script type="text/javascript" src="js/jquery.mobile.js"></script>
+
+        <script type="text/javascript" src="js/wnfportal_anmeldung.js"></script>
+    </head>
+    <body>
+        <div id="main" data-role="page">
+            <div data-role="header" data-position="fixed" class="ui-corner-top"><h1>wnfPortal</h1></div>
+            <ul id="main-btn" data-role="listview" data-inset="true">
+                <li><a href="" data-dsp-page="termine">Termine</a></li>
+                <li><a href="" data-dsp-page="aufgaben">Aufgaben</a></li>
+                <li><a href="" data-dsp-page="adressen">Adressen</a></li>
+                <li><a href="" data-dsp-page="adrtop10">Adressen Top 10</a></li>
+                <li><a href="" data-dsp-page="konten" data-dsp-update="q/konto">Konten</a></li>
+                <li><a href="" data-dsp-page="konten-ea" data-dsp-update="q/konto-ea">Einnahmen und Ausgaben</a></li>
+                <li><a href="" data-dsp-page="konten-allejahre" data-dsp-update="q/konto-allejahre">Konten alle Jahre</a></li>
+            </ul>
+            <div data-role="footer" data-position="fixed">
+                <ul id="main-btn" data-role="listview" data-inset="true">
+                    <li><a href="" data-dsp-page="about">About</a></li>
+                </ul>
+            </div>
+        </div>
+        <div id="termine" data-role="page">
+            <div data-role="header" data-position="fixed" class="ui-corner-top">
+                <a href="#" data-dsp-page="main" class="ui-btn ui-icon-arrow-l ui-btn-icon-notext ui-btn-left"></a>
+                <h1>Termine</h1>
+                <a href="#" class="ui-btn ui-icon-search ui-btn-icon-notext ui-btn-right"></a>
+            </div>
+            <div id="termine-template" style="display: none">
+                <ul data-role="listview">
+                    <li>
+                        <span class="table-left">Termin</span>
+                        <span class="table-right">Datum</span>
+                    </li>
+                </ul>
+            </div>
+            <div id="termineliste">
+                <ul data-role="listview" class="termineliste">
+                    <!-- hier werden die Aufgaben eingetragen--> 
+                </ul>
+            </div>
+            <div data-role="footer" class="ui-footer-fixed">
+                <span class="table-left">Anzahl</span>
+                <span class="table-right"></span>
+            </div>
+        </div>
+        <div id="aufgaben" data-role="page">
+            <div data-role="header" data-position="fixed" class="ui-corner-top">
+                <a href="#" data-dsp-page="main" class="ui-btn ui-icon-arrow-l ui-btn-icon-notext ui-btn-left"></a>
+                <h1>Aufgaben</h1>
+                <a href="#" class="ui-btn ui-icon-search ui-btn-icon-notext ui-btn-right"></a>
+            </div>
+            <div id="aufgaben-template" style="display: none">
+                <ul data-role="listview">
+                    <li>
+                        <span class="table-left">Aufgabe</span>
+                        <span class="table-right">Prio</span>
+                    </li>
+                </ul>
+            </div>
+            <div id="aufgabenliste">
+                <ul data-role="listview" class="aufgabenliste">
+                    <!-- hier werden die Aufgaben eingetragen--> 
+                </ul>
+            </div>
+            <div data-role="footer" class="ui-footer-fixed">
+                <span class="table-left">Anzahl</span>
+                <span class="table-right"></span>
+            </div>
+        </div>
+        <div id="adrtop10" data-role="page">
+            <div data-role="header" data-position="fixed" class="ui-corner-top">
+                <a href="#" data-dsp-page="main" class="ui-btn ui-icon-arrow-l ui-btn-icon-notext ui-btn-left"></a>
+                <h1>Adressen Top 10</h1>
+                <a href="#" class="ui-btn ui-icon-search ui-btn-icon-notext ui-btn-right"></a>
+            </div>
+            <div id="adrtop10-template" style="display: none">
+                <ul data-role="listview">
+                    <li>
+                        <span class="table-left">
+                            <h3 id="ui-li-adr-kurz">Adresse</h3>
+                            <p id="ui-li-adr-tel">Telefon</p>
+                            <p id="ui-li-adr-handy">Handy</p>
+                            <p id="ui-li-adr-email">E-Mail</p>
+                        </span>
+                        <span class="table-right">
+                            <a href="" class="ui-btn">Details</a>
+                        </span>
+                    </li>
+                </ul>
+            </div>
+            <div id="adrtop10liste">
+                <ul data-role="listview" class="adrtop10liste" data-dsp-page="adrdetails">
+                    <!-- hier werden die Top 10  eingetragen--> 
+                </ul>
+            </div>
+            <div data-role="footer" class="ui-footer-fixed">
+                <span class="table-left">Anzahl</span>
+                <span class="table-right"></span>
+            </div>
+        </div>
+        <div id="adressen" data-role="page">
+            <form id="adressen-such" data-role="panel" data-position="left" data-display="overlay">
+                <label for="adr-such">Suche:</label>
+                <input type="text" id="adr-such" name="such" value="" />
+                <label for="adr-feld" class="select">in:</label>
+                <select id="adr-feld" name="feld">
+                    <option value="1">Kurzname</option>
+                    <option value="2">Name</option>
+                    <option value="3">Adresse</option>
+                    <option value="5">Info</option>
+                    <option value="4">Nummer</option>
+                </select>
+                <label for="adr-sort">sortiert nach:</label>
+                <select name="sort" id="adr-sort">
+                    <option value="1">Kurzname</option>
+                    <option value="2">Nummer</option>
+                    <option value="3">Ort, Straße</option>
+                </select>
+                <a href="q/adressen" class="ui-btn">Suchen</a>
+            </form>
+            <div data-role="header" data-position="fixed" class="ui-corner-top">
+                <a href="#" data-dsp-page="main" class="ui-btn ui-icon-arrow-l ui-btn-icon-notext ui-btn-left"></a>
+                <h1>Adressen</h1>
+                <a href="#" class="ui-btn ui-icon-search ui-btn-icon-notext ui-btn-right" data-dsp-such="adressen-such"></a>
+            </div>
+            <div id="adressen-template" style="display: none">
+                <ul data-role="listview">
+                    <li>
+                        <span class="table-left">
+                            <h3 id="ui-li-adr-kurz">Adresse</h3>
+                            <p id="ui-li-adr-tel">Telefon</p>
+                            <p id="ui-li-adr-handy">Handy</p>
+                            <p id="ui-li-adr-email">E-Mail</p>
+                        </span>
+                        <span class="table-right">
+                            <a href="" class="ui-btn">Details</a>
+                        </span>
+                    </li>
+                </ul>
+            </div>
+            <div id="adressenliste">
+                <ul data-role="listview" class="adressenliste" data-dsp-page="adrdetails">
+                    <!-- hier werden die Adressen eingetragen--> 
+                </ul>
+            </div>
+            <div data-role="footer" class="ui-footer-fixed">
+                <span class="table-left">Anzahl</span>
+                <span class="table-right"></span>
+            </div>
+        </div>
+        <div id="adrdetails" data-role="page">
+            <div data-role="header" data-position="fixed" class="ui-corner-top">
+                <a href="#" data-dsp-page="adrtop10" class="ui-btn ui-icon-arrow-l ui-btn-icon-notext ui-btn-left"></a>
+                <h1>Adressdetails</h1>
+            </div>
+                <ul data-role="listview">
+                    <li>
+                        <span class="table-left">
+                            <h3 id="ui-li-adrdetails-kurz">Adresse</h3>
+                            <p id="ui-li-adrdetails-tel">Telefon</p>
+                            <p id="ui-li-adrdetails-handy">Handy</p>
+                            <p id="ui-li-adrdetails-email">E-Mail</p>
+                        </span>
+                        <span class="table-right">
+                        </span>
+                    </li>
+                </ul>
+        </div>
+        <div id="konten" data-role="page">
+            <div data-role="header" data-position="fixed" class="ui-corner-top">
+                <a href="#" data-dsp-page="main" class="ui-btn ui-icon-arrow-l ui-btn-icon-notext ui-btn-left"></a>
+                <h1>Konten</h1>
+            </div>
+            <div id="konten-template" style="display: none">
+                <ul data-role="listview">
+                    <li>
+                        <span class="table-left">Konto</span>
+                        <span class="table-right-currency">Saldo</span>
+                    </li>
+                </ul>
+            </div>
+            <div id="kontenliste">
+                <ul data-role="listview" class="kontenliste">
+                    <!-- hier werden die Konten eingetragen--> 
+                </ul>
+            </div>
+            <div data-role="footer" class="ui-footer-fixed">
+                <ul>
+                    <li>
+                        <span class="table-left">Summe</span>
+                        <span class="table-right-currency">Saldo</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div id="konten-ea" data-role="page">
+            <div data-role="header" data-position="fixed" class="ui-corner-top">
+                <a href="#" data-dsp-page="main" class="ui-btn ui-icon-arrow-l ui-btn-icon-notext ui-btn-left"></a>
+                <h1>Einnahmen und Ausgaben</h1>
+            </div>
+            <div id="konten-ea-template" style="display: none">
+                <ul data-role="listview">
+                    <li>
+                        <span class="table-left">Konto</span>
+                        <span class="table-right-currency">Saldo</span>
+                    </li>
+                </ul>
+            </div>
+            <div id="konten-ea-liste">
+                <ul data-role="listview" class="konten-ea-liste">
+                    <!-- hier werden die Konten eingetragen--> 
+                </ul>
+            </div>
+            <div data-role="footer" class="ui-footer-fixed">
+                <span class="table-left">SummeX</span>
+                <span class="table-right-currency"></span>
+            </div>
+        </div>
+        <div id="konten-allejahre" data-role="page">
+            <div data-role="header" data-position="fixed" class="ui-corner-top">
+                <a href="#" data-dsp-page="main" class="ui-btn ui-icon-arrow-l ui-btn-icon-notext ui-btn-left"></a>
+                <h1>Einnahmen und Ausgaben pro Jahr</h1>
+            </div>
+            <div id="konten-allejahre-template" style="display: none">
+                <ul data-role="listview">
+                    <li>
+                        <span class="table-left">Konto</span>
+                        <span class="table-right-currency">Saldo</span>
+                    </li>
+                </ul>
+            </div>
+            <div id="konten-allejahre-liste">
+                <ul data-role="listview" class="konten-allejahre-ul">
+                    <!-- hier werden die Summen Jahresweise eingetragen--> 
+                </ul>
+            </div>
+            <div data-role="footer" class="ui-footer">
+                <span class="table-left">Summe</span>
+                <span class="table-right-currency"></span>
+            </div>
+        </div>
+        <div id="about" data-role="page">
+            <div data-role="header" data-position="fixed" class="ui-corner-top">
+                <a href="#" data-dsp-page="main" class="ui-btn ui-icon-arrow-l ui-btn-icon-notext ui-btn-left"></a>
+                <h1>About</h1>
+            </div>
+            <div>
+                <img src="img/wlsoft.png" />
+                entwickelt mit jQuery Mobile und HTML5.
+                <br />
+                Zugriff auf Datenbanken wnfKontakt und wnfKuB
+                <br />
+                <br />
+                Version 04.2016
+                <br />
+                <br />
+                (c) <a href="http://www.wlsoft.de">wlsoft.de</a>
+            </div>
+        </div>
+    </body>
+</html>
