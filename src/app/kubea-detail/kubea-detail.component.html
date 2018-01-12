@@ -1,0 +1,11 @@
+<div *ngIf="kubea">
+
+  <h2>{{ kubea.kurz | uppercase }} Details</h2>
+  <div><span>id: </span>{{kubea.id}}</div>
+  <div>
+    <label>kurz:
+      <input [(ngModel)]="kubea.kurz" placeholder="kurz"/>
+    </label>
+  </div>
+
+</div>
