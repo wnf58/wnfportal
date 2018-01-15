@@ -8,18 +8,26 @@ import { KubeaComponent } from './kubea/kubea.component';
 import { KubeaService } from './kubea.service';
 import { MessageService } from './message.service';
 import { KubeaDetailComponent } from './kubea-detail/kubea-detail.component';
+import { AppRoutingModule } from './/app-routing.module';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { MessagesComponent }    from './messages/messages.component';
+import { KubeaSearchComponent } from './kubea-search/kubea-search.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     KubeaComponent,
-    KubeaDetailComponent
+    KubeaDetailComponent,
+    DashboardComponent,
+    MessagesComponent,
+    KubeaSearchComponent
   ],
   imports: [
     BrowserModule,
     HttpClientModule,
-    FormsModule
+    FormsModule,
+    AppRoutingModule
   ],
   providers: [KubeaService, MessageService],
   bootstrap: [AppComponent]

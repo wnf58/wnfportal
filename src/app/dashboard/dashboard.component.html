@@ -1,0 +1,16 @@
+<ul>
+  <li><a routerLink="/kubea">Letzter Monat</a></li>
+  <li><a routerLink="/kubea/kontostand">Kontostand</a></li>
+</ul>
+<h3>E/A</h3>
+<div class="grid grid-pad">
+  <a *ngFor="let kubea of kubeaRecords" class="col-1-4"
+      routerLink="/detail/{{kubea.id}}">
+    <div class="module kubea">
+      <h4>{{kubea.name}}</h4>
+    </div>
+  </a>
+</div>
+
+<app-kubea-search></app-kubea-search>
+
