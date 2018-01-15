@@ -131,6 +131,12 @@ class wnfPortal(object):
 
   jsonListEA.exposed = True
 
+  def jsonDetailEA(self,id):
+    j = self.q.konten_detail_ea(id)
+    return j
+
+  jsonDetailEA.exposed = True
+
 
 def CORS():
   cherrypy.response.headers["Access-Control-Allow-Origin"] = "*"

@@ -18,14 +18,14 @@ export class KubeaService {
   // private kubeaUrl = 'api/kubea';  // URL to web api
   //No 'Access-Control-Allow-Origin' header is present
   //private kubeaUrl = 'http://c2016.fritz.box:8081/kontostandLetzterMonat'
-  private kubeaUrl = 'http://c2016.fritz.box:8081/jsonListEA'
+  private kubeaUrl = 'http://c2016.fritz.box:8081'
 
   constructor(
     private http: HttpClient,
     private messageService: MessageService) { }
 
   getKubEARecords(): Observable<KubeaRecord[]> {
-    return this.http.get<KubeaRecord[]>(this.kubeaUrl)
+    return this.http.get<KubeaRecord[]>(this.kubeaUrl+'/jsonListEA')
       .pipe(
         tap(kubea => this.log('fetched kubea')),
         catchError(this.handleError('getKubEA', []))
@@ -48,7 +48,7 @@ export class KubeaService {
 
   /** GET kubea by id. Will 404 if id not found */
   getKubEA(id: number): Observable<KubeaRecord> {
-    const url = `${this.kubeaUrl}/${id}`;
+    const url = `${this.kubeaUrl}/jsonDetailEA/${id}`;
     return this.http.get<KubeaRecord>(url).pipe(
       tap(_ => this.log(`fetched kubea id=${id}`)),
       catchError(this.handleError<KubeaRecord>(`getKubEA id=${id}`))

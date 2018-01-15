@@ -179,6 +179,30 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
       ea.append(k)
     return ea
 
+  def jsonDetailEA(self,id):
+    aSQL = """
+            SELECT E.ID,E.DATUM,E.KURZ, E.BEZ, E.BETRAG
+            FROM KO_KUBEA E
+            WHERE E.ID = %s
+            ORDER BY E.DATUM DESC,E.KURZ
+          """
+    aSQL = aSQL % (id)
+    print(aSQL)
+    cur = self.sqlOpen(aSQL)
+    if (cur == None):
+      return []
+    for row in cur:
+      s = "%s | %s" % (row[1].strftime("%d.%m.%y"), row[2])
+      ttmmjj = "%s" % (row[1].strftime("%d.%m.%y"))
+      # print s
+      k = {'id': row[0],
+           'datum': str(row[1]),
+           'kurz': row[2],
+           'bez': row[3],
+           'betrag': T.sDM(row[4])}
+      print(k)
+      return k
+
   def htmlLetzteEA(self):
     aSumme, ea = self.listeLetzteEA()
     s = ''

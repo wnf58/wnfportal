@@ -73,6 +73,16 @@ class object_q(object):
       return json.dumps({})
 
   @cherrypy.expose
+  def konten_detail_ea(self,id):
+    if self.is_angemeldet():
+      k = wnfportal_dm_konten.dmKonten()
+      j = k.jsonDetailEA(id)
+      # print j
+      return json.dumps(j)
+    else:
+      return json.dumps({})
+
+  @cherrypy.expose
   def konten_ea_html(self):
     if self.is_angemeldet():
       k = wnfportal_dm_konten.dmKonten()
