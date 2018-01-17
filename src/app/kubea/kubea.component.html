@@ -11,7 +11,7 @@
     [class.selected]="kubea === selectedKubEA">
     <td>{{kubea.datum | date: 'dd.MM.yy'}}</td>
     <td><a routerLink="/kubea/detail/{{kubea.id}}">{{kubea.kurz}}</a></td>
-    <td class="wnfDM">{{kubea.betrag}}</td>
+    <td class="wnfDM">{{kubea.betrag | currency: '€'}}</td>
   </tr>
 </table>
 

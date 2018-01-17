@@ -174,7 +174,7 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
            'datum': str(row[1]),
            'kurz': row[2],
            'bez': row[3],
-           'betrag': T.sDM(row[4])}
+           'betrag': str(row[4])}
       # print(k)
       ea.append(k)
     print(ea)
@@ -200,7 +200,7 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
            'datum': str(row[1]),
            'kurz': row[2],
            'bez': row[3],
-           'betrag': T.sDM(row[4])}
+           'betrag': str(row[4])}
       print(k)
       return k
 
@@ -226,7 +226,7 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
       k = {'id': row[0],
            'datum': str(row[1]),
            'kurz': row[2],
-           'betrag': T.sDM(row[3])}
+           'betrag': str(row[3])}
       # print(k)
       ea.append(k)
     print(ea)

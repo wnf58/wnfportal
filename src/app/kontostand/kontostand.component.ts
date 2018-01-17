@@ -33,10 +33,10 @@ export class KontostandComponent implements OnInit {
   }
 
   getKontostand(): void {
-    this.kubeaService.getKontostand()
-        .subscribe(konto => this.kontostandRecords = konto);
     this.kubeaService.getKontostandSumme()
         .subscribe(summe => this.kontostandSumme = summe);
+    this.kubeaService.getKontostand()
+        .subscribe(konto => this.kontostandRecords = konto);
   }
 
   goBack(): void {

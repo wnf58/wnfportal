@@ -11,9 +11,9 @@
     [class.selected]="konto === selectedKonto">
     <td>{{konto.datum | date: 'dd.MM.yy'}}</td>
     <td><a routerLink="/kubea/detail/{{konto.id}}">{{konto.kurz}}</a></td>
-    <td class="wnfDM">{{konto.betrag}}</td>
+    <td class="wnfDM">{{konto.betrag | currency: '€'}}</td>
   </tr>
-  <tr>
+  <tr *ngIf="kontostandSumme">
     <th>Summe</th>
     <th></th>
     <th class="wnfSumme">{{kontostandSumme.summe | currency: '€'}}</th>
