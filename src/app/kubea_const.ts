@@ -19,6 +19,10 @@ export class KontoRecord {
   betrag: number;
 }
 
+export class KontostandSummeRecord {
+  summe: number;
+}
+
 export const KONTOSTANDDEMO: KontoRecord[] = [
   { id: 11, kurz: 'konto_kurz_11', bez: 'konto_bez_11', datum: Date.now(), betrag: 11.11 },
   { id: 12, kurz: 'konto_kurz_12', bez: 'konto_bez_12', datum: Date.now(), betrag: 12.12 }

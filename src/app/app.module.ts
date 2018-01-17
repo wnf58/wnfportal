@@ -1,7 +1,9 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { NgModule, LOCALE_ID } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { registerLocaleData } from '@angular/common';
+import localeDE from '@angular/common/locales/de';
 
 import { AppComponent } from './app.component';
 import { KubeaComponent } from './kubea/kubea.component';
@@ -14,6 +16,7 @@ import { MessagesComponent }    from './messages/messages.component';
 import { KubeaSearchComponent } from './kubea-search/kubea-search.component';
 import { KontostandComponent } from './kontostand/kontostand.component';
 
+registerLocaleData(localeDE);
 
 @NgModule({
   declarations: [
@@ -31,7 +34,12 @@ import { KontostandComponent } from './kontostand/kontostand.component';
     FormsModule,
     AppRoutingModule
   ],
-  providers: [KubeaService, MessageService],
+  providers: [
+      {
+      provide: LOCALE_ID,
+      useValue: 'de' // 'de-DE' for Germany, 'fr-FR' for France ...
+      },
+      KubeaService, MessageService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

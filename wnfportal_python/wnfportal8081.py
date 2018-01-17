@@ -139,10 +139,15 @@ class wnfPortal(object):
 
   def jsonKontostand(self):
     j = self.q.konten_kontostand()
-    print(j)
     return j
 
   jsonKontostand.exposed = True
+
+  def jsonKontostandSumme(self):
+    j = self.q.konten_kontostandSumme()
+    return j
+
+  jsonKontostandSumme.exposed = True
 
 
 def CORS():

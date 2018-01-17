@@ -17,6 +17,8 @@ export class KontostandComponent implements OnInit {
 
   kontostandRecords: KontoRecord[];
 
+  kontostandSumme: KontostandSummeRecord;
+
   constructor(
     private kubeaService: KubeaService,
     private location: Location,
@@ -33,6 +35,8 @@ export class KontostandComponent implements OnInit {
   getKontostand(): void {
     this.kubeaService.getKontostand()
         .subscribe(konto => this.kontostandRecords = konto);
+    this.kubeaService.getKontostandSumme()
+        .subscribe(summe => this.kontostandSumme = summe);
   }
 
   goBack(): void {

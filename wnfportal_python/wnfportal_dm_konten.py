@@ -232,6 +232,21 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
     print(ea)
     return ea
 
+  def jsonKontostandSumme(self):
+    aSQL = """
+            SELECT 
+              SUM(E.BETRAG)
+            FROM KO_KUBEA E
+          """
+    # print(aSQL)
+    cur = self.sqlOpen(aSQL)
+    if (cur == None):
+      return {}
+    for row in cur:
+      k = {'summe': str(row[0])}
+      print(k)
+      return k
+
   def htmlLetzteEA(self):
     aSumme, ea = self.listeLetzteEA()
     s = ''

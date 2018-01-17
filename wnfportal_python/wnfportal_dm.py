@@ -83,6 +83,16 @@ class object_q(object):
       return json.dumps({})
 
   @cherrypy.expose
+  def konten_kontostandSumme(self):
+    if self.is_angemeldet():
+      k = wnfportal_dm_konten.dmKonten()
+      j = k.jsonKontostandSumme()
+      # print j
+      return json.dumps(j)
+    else:
+      return json.dumps({})
+
+  @cherrypy.expose
   def kontostand(self):
     if self.is_angemeldet():
       k = wnfportal_dm_konten.dmKonten()

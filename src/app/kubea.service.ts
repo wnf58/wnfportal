@@ -40,6 +40,14 @@ export class KubeaService {
       );
   }
 
+  getKontostandSumme(): Observable<string> {
+    return this.http.get<string>(this.kubeaUrl+'/jsonKontostandSumme')
+      .pipe(
+        tap(konto => this.log('fetched KontostandSumme')),
+        catchError(this.handleError('getKontostandSumme', []))
+      );
+  }
+
   /** GET kubea by id. Return `undefined` when id not found */
   getKubEANo404<Data>(id: number): Observable<KubeaRecord> {
     const url = `${this.kubeaUrl}/?id=${id}`;
