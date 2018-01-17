@@ -76,7 +76,7 @@ class object_q(object):
   def konten_kontostand(self):
     if self.is_angemeldet():
       k = wnfportal_dm_konten.dmKonten()
-      j = k.jsonListEA()
+      j = k.jsonListKonten()
       # print j
       return json.dumps(j)
     else:

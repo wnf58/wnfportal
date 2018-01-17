@@ -161,7 +161,7 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
             ORDER BY E.DATUM DESC,E.KURZ
           """
     aSQL = aSQL % (T.wnfDateToSQL(T.wnfErsterTagVormonat()))
-    print(aSQL)
+    # print(aSQL)
     cur = self.sqlOpen(aSQL)
     if (cur == None):
       return []
@@ -175,8 +175,9 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
            'kurz': row[2],
            'bez': row[3],
            'betrag': T.sDM(row[4])}
-      print(k)
+      # print(k)
       ea.append(k)
+    print(ea)
     return ea
 
   def jsonDetailEA(self,id):
@@ -202,6 +203,34 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
            'betrag': T.sDM(row[4])}
       print(k)
       return k
+
+  def jsonListKonten(self):
+    aSQL = """
+            SELECT 
+              K.ID,
+              MAX(E.DATUM),
+              K.KURZ,
+              SUM(E.BETRAG)
+            FROM KO_KUBEA E
+            LEFT JOIN KO_KUB K ON K.ID=E.KUB_ID
+            GROUP BY K.KURZ,K.ID
+            HAVING SUM(E.BETRAG)<>0
+            ORDER BY K.KURZ
+          """
+    # print(aSQL)
+    cur = self.sqlOpen(aSQL)
+    if (cur == None):
+      return []
+    ea = []
+    for row in cur:
+      k = {'id': row[0],
+           'datum': str(row[1]),
+           'kurz': row[2],
+           'betrag': T.sDM(row[3])}
+      # print(k)
+      ea.append(k)
+    print(ea)
+    return ea
 
   def htmlLetzteEA(self):
     aSumme, ea = self.listeLetzteEA()
