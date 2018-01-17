@@ -188,7 +188,7 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
             ORDER BY E.DATUM DESC,E.KURZ
           """
     aSQL = aSQL % (id)
-    print(aSQL)
+    # print(aSQL)
     cur = self.sqlOpen(aSQL)
     if (cur == None):
       return []
