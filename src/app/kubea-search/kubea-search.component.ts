@@ -28,7 +28,7 @@ export class KubeaSearchComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.kubea$ = this.searchTerms.pipe(
+    this.kubeas$ = this.searchTerms.pipe(
       // wait 300ms after each keystroke before considering the term
       debounceTime(300),
 

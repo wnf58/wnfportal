@@ -1,0 +1,18 @@
+<h2>Kontostand</h2>
+<button (click)="goBack()">go back</button>
+
+<table class="kontostandRecords">
+  <tr>
+    <th>Datum</th>
+    <th>Bezeichnung</th>
+    <th>Betrag</th>
+  </tr>
+  <tr *ngFor="let konto of kontostandRecords"
+    [class.selected]="konto === selectedKonto">
+    <td>{{konto.datum | date: 'dd.MM.yy'}}</td>
+    <td><a routerLink="/kubea/detail/{{konto.id}}">{{konto.kurz}}</a></td>
+    <td class="wnfDM">{{konto.betrag}}</td>
+  </tr>
+</table>
+
+<button (click)="goBack()">go back</button>

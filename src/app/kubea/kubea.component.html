@@ -1,6 +1,5 @@
-<h2>Einnahmen/Ausgaben</h2>
-
-<app-kubea-detail [kubea]="selectedKubEA"></app-kubea-detail>
+<h2>Einnahmen/Ausgaben {{title}}</h2>
+<button (click)="goBack()">go back</button>
 
 <table class="kubeaRecords">
   <tr>
@@ -9,10 +8,11 @@
     <th>Betrag</th>
   </tr>
   <tr *ngFor="let kubea of kubeaRecords"
-    [class.selected]="kubea === selectedKubEA"
-    (click)="onSelect(kubea)">
+    [class.selected]="kubea === selectedKubEA">
     <td>{{kubea.datum | date: 'dd.MM.yy'}}</td>
-    <td>{{kubea.kurz}}</td>
+    <td><a routerLink="/kubea/detail/{{kubea.id}}">{{kubea.kurz}}</a></td>
     <td class="wnfDM">{{kubea.betrag}}</td>
   </tr>
 </table>
+
+<button (click)="goBack()">go back</button>

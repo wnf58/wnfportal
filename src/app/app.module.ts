@@ -12,6 +12,7 @@ import { AppRoutingModule } from './/app-routing.module';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { MessagesComponent }    from './messages/messages.component';
 import { KubeaSearchComponent } from './kubea-search/kubea-search.component';
+import { KontostandComponent } from './kontostand/kontostand.component';
 
 
 @NgModule({
@@ -21,7 +22,8 @@ import { KubeaSearchComponent } from './kubea-search/kubea-search.component';
     KubeaDetailComponent,
     DashboardComponent,
     MessagesComponent,
-    KubeaSearchComponent
+    KubeaSearchComponent,
+    KontostandComponent
   ],
   imports: [
     BrowserModule,

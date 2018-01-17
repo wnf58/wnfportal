@@ -5,7 +5,7 @@ import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of';
 import { catchError, map, tap } from 'rxjs/operators';
 
-import { KubeaRecord, KUBEADEMO } from './kubea_const';
+import { KubeaRecord, KontoRecord, KUBEADEMO } from './kubea_const';
 import { MessageService } from './message.service';
 
 const httpOptions = {
@@ -29,6 +29,14 @@ export class KubeaService {
       .pipe(
         tap(kubea => this.log('fetched kubea')),
         catchError(this.handleError('getKubEA', []))
+      );
+  }
+
+  getKontostand(): Observable<KontoRecord[]> {
+    return this.http.get<KontoRecord[]>(this.kubeaUrl+'/jsonKontostand')
+      .pipe(
+        tap(konto => this.log('fetched Kontostand')),
+        catchError(this.handleError('getKontostand', []))
       );
   }
 
