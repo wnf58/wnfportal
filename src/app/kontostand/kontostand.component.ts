@@ -3,7 +3,11 @@ import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 
 import { KontoRecord } from '../kubea_const';
+import { KontostandSummeRecord } from '../kubea_const';
+import { DEFAULTKONTOSTANDSUMME } from '../kubea_const';
+
 import { KubeaService } from '../kubea.service';
+import { MessageService } from '../message.service';
 
 @Component({
   selector: 'app-kontostand',
@@ -17,12 +21,14 @@ export class KontostandComponent implements OnInit {
 
   kontostandRecords: KontoRecord[];
 
-  kontostandSumme: KontostandSummeRecord;
+  kontostandSumme: KontostandSummeRecord[];
 
   constructor(
     private kubeaService: KubeaService,
     private location: Location,
-    private route: ActivatedRoute) { }
+    private route: ActivatedRoute,
+    private messageService: MessageService) { }
+
 
   ngOnInit() {
     this.getKontostand();
@@ -42,5 +48,11 @@ export class KontostandComponent implements OnInit {
   goBack(): void {
     this.location.back();
   }
+
+  /** Log a kubeaService message with the MessageService */
+  private log(message: string) {
+    this.messageService.add('kontostand: ' + message);
+  }
+
 
 }

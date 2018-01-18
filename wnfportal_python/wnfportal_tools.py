@@ -42,6 +42,8 @@ def wnfErsterTagVormonat():
 
 def sDM(aBetrag):
   locale.setlocale(locale.LC_ALL, 'de_DE.UTF-8')
+  if not aBetrag:
+    aBetrag=0
   return locale.currency(aBetrag, grouping=True)
   # return '{:20,.2f}'.format( aBetrag )
 

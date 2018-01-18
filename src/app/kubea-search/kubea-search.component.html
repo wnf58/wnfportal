@@ -4,7 +4,7 @@
   <input #searchBox id="search-box" (keyup)="search(searchBox.value)" />
 
   <ul class="search-result">
-    <li *ngFor="let kubea of kubeaRecords$ | async" >
+    <li *ngFor="let kubea of kubeaRecords | async" >
       <a routerLink="/detail/{{kubea.id}}">
         {{hero.name}}
       </a>

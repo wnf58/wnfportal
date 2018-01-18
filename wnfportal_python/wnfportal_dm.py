@@ -31,7 +31,7 @@ class object_q(object):
       summe = T.sDM(k.summeAlleKonten())
       s = ''
       for l in k.listeAlleKonten():
-        konto = l['konto'].encode('utf-8')
+        konto = l['konto'] #.encode('utf-8')
         saldo = l['saldo']
         # print type(konto),konto
         s = '%s <tr><td class=table-left>%s</td><td class=table-right-currency>%s</td></tr>' % (s, konto, saldo)

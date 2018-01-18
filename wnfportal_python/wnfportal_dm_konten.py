@@ -16,7 +16,8 @@ from reportlab.graphics import renderPM
 class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
   def __init__(self):
     wnfportal_dm_datenbank.dmDatenbank.__init__(self)
-    self.setIniDatei('wnfKuB.ini')
+    #self.setIniDatei('wnfKuB.ini')
+    self.setIniDatei('wnfKITAOffice.ini')
 
   def summeAlleKonten(self):
     aSQL = """
@@ -243,7 +244,7 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
     if (cur == None):
       return {}
     for row in cur:
-      k = {'summe': str(row[0])}
+      k = [{'summe': str(row[0])}]
       print(k)
       return k
 
@@ -251,8 +252,8 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
     aSumme, ea = self.listeLetzteEA()
     s = ''
     for l in ea:
-      datum = l['ttmmjj'].encode('utf-8')
-      kurz = l['kurz'].encode('utf-8')
+      datum = l['ttmmjj'] #.encode('utf-8')
+      kurz = l['kurz'] #.encode('utf-8')
       betrag = l['betrag']
       s = '%s <tr><td class=table-3c-spalte1>%s</td><td class=table-3c-spalte2>%s</td><td class=table-3c-spalte3>%s</td></tr>' % (
         s, datum, kurz, betrag)
@@ -382,14 +383,16 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
   def getProjekt_ID(self, aKurz):
     aSQL = "SELECT MAX(ID) FROM KO_KUBPROJEKT P WHERE P.KURZ='%s'"
     aSQL = aSQL % (aKurz)
-    print
-    aSQL
+    print(aSQL)
     cur = self.sqlOpen(aSQL)
     if (cur == None):
       return 0
     else:
       for row in cur:
-        return row[0]
+        if (row[0]):
+          return row[0]
+        else:
+          return 0
 
   def getProjekt_ID_Wintergarten_2017(self):
     return self.getProjekt_ID('Wintergarten 2017')
@@ -398,8 +401,8 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
     aSumme, ea = self.listeProjekt(aProjekt_ID)
     s = ''
     for l in ea:
-      datum = l['ttmmjj'].encode('utf-8')
-      kurz = l['kurz'].encode('utf-8')
+      datum = l['ttmmjj'] #.encode('utf-8')
+      kurz = l['kurz'] #.encode('utf-8')
       betrag = l['betrag']
       s = '%s <tr><td class=table-3c-spalte1>%s</td><td class=table-3c-spalte2>%s</td><td class=table-3c-spalte3>%s</td></tr>' % (
         s, datum, kurz, betrag)
@@ -413,8 +416,8 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
     aSumme, ea = self.listeProjektK(aProjekt_ID)
     s = ''
     for l in ea:
-      datum = l['ttmmjj'].encode('utf-8')
-      kurz = l['kurz'].encode('utf-8')
+      datum = l['ttmmjj'] #.encode('utf-8')
+      kurz = l['kurz'] #.encode('utf-8')
       betrag = l['betrag']
       s = '%s <tr><td class=table-3c-spalte1>%s</td><td class=table-3c-spalte2>%s</td><td class=table-3c-spalte3>%s</td></tr>' % (
         s, datum, kurz, betrag)

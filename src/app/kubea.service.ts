@@ -5,8 +5,9 @@ import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of';
 import { catchError, map, tap } from 'rxjs/operators';
 
-import { KubeaRecord, KontoRecord, KUBEADEMO } from './kubea_const';
+import { KubeaRecord, KontoRecord, KontostandSummeRecord } from './kubea_const';
 import { MessageService } from './message.service';
+
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json'})
@@ -40,10 +41,10 @@ export class KubeaService {
       );
   }
 
-  getKontostandSumme(): Observable<string> {
-    return this.http.get<string>(this.kubeaUrl+'/jsonKontostandSumme')
+  getKontostandSumme(): Observable<KontostandSummeRecord[]> {
+    return this.http.get<KontostandSummeRecord[]>(this.kubeaUrl+'/jsonKontostandSumme')
       .pipe(
-        tap(konto => this.log('fetched KontostandSumme')),
+        tap(summe => this.log('fetched KontostandSumme')),
         catchError(this.handleError('getKontostandSumme', []))
       );
   }

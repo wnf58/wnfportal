@@ -16,7 +16,7 @@
   <tr *ngIf="kontostandSumme">
     <th>Summe</th>
     <th></th>
-    <th class="wnfSumme">{{kontostandSumme.summe | currency: '€'}}</th>
+    <th class="wnfSumme">{{kontostandSumme[0].summe | currency: '€'}}</th>
   </tr>
 </table>
 
