@@ -107,7 +107,7 @@ export class KubeaService {
 
   /** PUT: update the kubea on the server */
   updateKubEA (kubea: KubeaRecord): Observable<any> {
-    return this.http.put(this.kubeaUrl, kubea, httpOptions).pipe(
+    return this.http.put(this.kubeaUrl+'/updater', kubea, httpOptions).pipe(
       tap(_ => this.log(`updated kubea id=${kubea.id}`)),
       catchError(this.handleError<any>('updateKubEA'))
     );

@@ -16,8 +16,8 @@ from reportlab.graphics import renderPM
 class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
   def __init__(self):
     wnfportal_dm_datenbank.dmDatenbank.__init__(self)
-    #self.setIniDatei('wnfKuB.ini')
-    self.setIniDatei('wnfKITAOffice.ini')
+    self.setIniDatei('wnfKuB.ini')
+    #self.setIniDatei('wnfKITAOffice.ini')
 
   def summeAlleKonten(self):
     aSQL = """

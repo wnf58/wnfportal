@@ -34,6 +34,9 @@ def server_dict():
   c = {'global': g}
   c['/'] = {'tools.staticdir.on': True, 'tools.staticdir.dir': "www", 'tools.staticdir.index': "index.html"}
   # c['/']={'tools.staticdir.on':True,'tools.staticdir.dir':"m",'tools.staticdir.index' : "index.html"}
+  # für put-Anweisungen
+  c['/put_url'] = {'tools.response_headers.on': True,
+                   'tools.response_headers.headers': [('Content-Type', 'text/plain')]}
   return c
 
 
@@ -83,6 +86,13 @@ class wnfPortal(object):
 
   index.exposed = True
 
+  def updater(self, data):
+    cherrypy.log.error("hello")
+    cherrypy.log.error(data)
+    return "The data {} has been puted".format(data)
+
+  updater.exposed = True
+
   def kontostand(self):
     k = wnfHTMLKopf('Kontostand', 'Kontostand')
     b = self.q.kontenhtml()
@@ -131,7 +141,7 @@ class wnfPortal(object):
 
   jsonListEA.exposed = True
 
-  def jsonDetailEA(self,id):
+  def jsonDetailEA(self, id):
     j = self.q.konten_detail_ea(id)
     return j
 
@@ -156,7 +166,8 @@ def CORS():
 
 def main():
   cherrypy.tools.CORS = cherrypy.Tool('before_handler', CORS)
-  cherrypy.quickstart(wnfPortal(), config=server_dict())
+  webapp = wnfPortal()
+  cherrypy.quickstart(webapp, config=server_dict())
   return 0
 
 
