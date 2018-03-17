@@ -49,7 +49,7 @@ def wnfHTMLKopf(aTitle, aCaption):
        '   <meta name="apple-mobile-web-app-capable" content="yes" />'
        '   <meta name="apple-mobile-web-app-status-bar-style" content="black" />'
        '   <link rel="apple-touch-startup-image" href="img/wnfPortal.png" />'
-       '   <link rel="stylesheet" href="css/wnfportal.css"/>'
+       '   <link rel="stylesheet" href="css/wnfportal_2.css"/>'
        '</head>'
        '<body>'
        '<h1>%s</h1>')
@@ -77,6 +77,7 @@ class wnfPortal(object):
       "<ul>"
       "  <li><a href=kontostand>Kontostand</a></li>"
       "  <li><a href=kontostandAlleJahre>Kontostand alle Jahre</a></li>"
+      "  <li><a href=kontostandAlleMonate>Kontostand alle Monate</a></li>"
       "  <li><a href=kontostandLetzterMonat>Kontostand Letzter Monat</a></li>"
       "  <li><a href=projektWintergarten2017>Projekt Wintergarten 2017</a></li>"
       "</ul>"
@@ -108,6 +109,15 @@ class wnfPortal(object):
     return "%s%s%s" % (k, b, f)
 
   kontostandAlleJahre.exposed = True
+
+  def kontostandAlleMonate(self):
+    k = wnfHTMLKopf('Kontostand alle Monate', 'Kontostand alle Monate')
+    b = self.q.konten_allemonate_html()
+    f = wnfHTMLFuss()
+    return "%s%s%s" % (k, b, f)
+
+  kontostandAlleMonate.exposed = True
+
 
   def kontostandLetzterMonat(self):
     k = wnfHTMLKopf('E/A Letzter Monat', 'E/A Letzter Monat')
