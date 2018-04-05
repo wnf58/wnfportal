@@ -10,6 +10,7 @@
 
 import os
 import cherrypy
+import json
 from wnfportal_dm import object_q
 
 ENTWICKLUNG = True
@@ -168,6 +169,15 @@ class wnfPortal(object):
     return j
 
   jsonKontostandSumme.exposed = True
+
+  @cherrypy.expose
+  def submit(self, name):
+    print(name)
+    k = [{'title': name}]
+    j = json.dumps(k)
+    return j
+    cherrypy.response.headers['Content-Type'] = 'application/json'
+    return json.dumps(dict(title="Hello, %s" % name))
 
 
 def CORS():
