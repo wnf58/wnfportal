@@ -5,7 +5,7 @@ var listea = (function(){
 
 	/* function get (Informationen abfragen und Callback-Funktion aufrufen) */
 	function get(){
-		$("#listeaHeader").empty().append(res.value(JKEY_STOCK));
+		$("#listeaHeader").empty().append('xxxx');
 		$("#btn-listea-refresh").show();
 		fn.getJSONHerde(QUERY_LISTEA,'', '', _process);
 	}
