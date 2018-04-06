@@ -4,7 +4,7 @@ var fn = (function(){
 		//changePage wird unter v1.5 nicht mehr existieren
 		$('body').pagecontainer('change', aPage, {changeHash: false, transition: 'none'});
 	}
-	
+
 	/* pageloading (Seitenladen Bild ein ausblenden) */
 	var pageloading = (function(){
 		//start
@@ -16,18 +16,18 @@ var fn = (function(){
 				html: ''
 			});
 		}
-		
+
 		//stop
 		function stop(){
 			$.mobile.loading('hide');
 		}
-		
+
 		return {
 			start: start,
 			stop: stop
 		};
 	})();
-	
+
 	/* navigateToHome (zur Home Seite) */
 	function navigateToHome(){
 		var page = $('body').pagecontainer('getActivePage').attr('id');
@@ -36,23 +36,23 @@ var fn = (function(){
 			changeAndShowPage('#page-home');
 		}
 	}
-	
+
 	/* setDefaults (alle Elemente ausblenden) */
 	function setDefaults(aLogin){
 		if (!aLogin){
 			$('#navbar').hide();
 			$('#home-content').empty();
 			$('#select-clients').empty();
-			$('#select-clients-button > span').empty();			
+			$('#select-clients-button > span').empty();
 		}
-		
-		$('#content-inventory').empty();				
+
+		$('#content-inventory').empty();
 		animal.reset;
 	}
-	
+
 	/* function valueExistsInArray (überprüft, ob Wert im Array vorhanden ist, wenn aEmptyArrayReturnTrue -> wird bei einem leeren übergebenen Array trotzdem true zurückgeliefert) */
 	function valueExistsInArray(aValue, aArray, aEmptyArrayReturnTrue){
-		//Überprüfen ob Array leer ist 
+		//Überprüfen ob Array leer ist
 		if(aArray.length == 0){
 			if (aEmptyArrayReturnTrue){
 				return true;
@@ -70,7 +70,7 @@ var fn = (function(){
 			return false;
 		}
 	}
-	
+
 	/* function preloadImages (lädt übergebene Bilder vor) */
 	function preloadImages(aImages) {
 	    $(aImages).each(function(){
@@ -80,7 +80,8 @@ var fn = (function(){
 
     /* function getJSONHerde (erweitert die getJSON-Anweisung um den Parameter sessionid=) */
 	function getJSONHerde(q1,q2,b,c) {
-	    $.getJSON(q1.concat(SITZUNG).concat(q2),b,c)
+	    //$.getJSON(q1.concat(SITZUNG).concat(q2),b,c)
+	    $.getJSON(q1.concat(q2),b,c)
 	}
 
 

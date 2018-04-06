@@ -22,25 +22,25 @@ var listea = (function(){
 	function _process(aData){
 		listeaCnt = 0;
 		var html = '';
-
+    //console.log(aData);
 		//überprüfen ob Bestand nicht leer ist
-		if (!$.isEmptyObject(aData.LISTEA)){
+		if (!$.isEmptyObject(aData)){
 			//JSON sortieren
-			aData.LISTEA.sort(_sortJSON);
+			//aData.LISTEA.sort(_sortJSON);
 			listeaJSON = aData;
 
 			html = '';
 
-			html += '<table> id="list-listea" data-role="listview">';
+			html += '<table id="list-listea" data-role="listview">';
 
 			//Listeneinträge hinzufügen
-			html += _getHTMLLiElementAmount(listeaJSON.LISTEA, 20);
+			html += _getHTMLLiElementAmount(listeaJSON, 20);
 
 			//Hauptliste abschließen + Suchergebnis-Liste hinzufügen
 			html += '</ul><ul id="list-listeaSearch" class="hidden" data-role="listview"></ul>';
 
 			//Filter popup erstellen
-			_createFilterPopup(aData);
+			//_createFilterPopup(aData);
 		} else {
 			html = '<h3 class="centerText">Keine Daten vorhanden</h3>';
 		}
@@ -59,12 +59,12 @@ var listea = (function(){
 
 
 		//Elemente hinzufügen, solange bis Seite scrollbar ist
-		if (!$.isEmptyObject(listeaJSON.LISTEA)){
+		if (!$.isEmptyObject(listeaJSON)){
     		//Anzahl Tiere anzeigen
-		    $('#state-animalCnt').empty().append(aData.LISTEA.length + ' ' + res.value(JKEY_ANIMALS));
+		    $('#state-animalCnt').empty().append(aData.length + ' Buchungssätze');
             //Tiere anzeigen
-			while (($('#page-listea').height() <= $(window).height()) && (listeaCnt < listeaJSON.LISTEA.length)) {
-				$('#list-listea').append(_getHTMLLiElementAmount(listeaJSON.LISTEA, 10));
+			while (($('#page-listea').height() <= $(window).height()) && (listeaCnt < listeaJSON.length)) {
+				$('#list-listea').append(_getHTMLLiElementAmount(listeaJSON, 10));
 				$('#list-listea').listview().listview('refresh');
 			}
 		}
@@ -73,16 +73,11 @@ var listea = (function(){
 
 	/* function _getHTMLLiElementAmount (Menge von Listeneinträgen zurückliefern (aCnt = Anzahl Elemente)) */
 	function _getHTMLLiElementAmount(aData, aCnt){
+	  var fromIndex = 0;
 		var liAmount = '';
 		var len = aData.length;
-		var fromIndex = 0;
 
-		//ListCount unterscheiden, je nachdem welche Liste gerade angezeigt wird
-		if ($('#list-listeaSearch').is(':visible')){
-			fromIndex = listeaSearchCnt;
-		} else {
-			fromIndex = listeaCnt;
-		}
+		fromIndex = listeaCnt;
 
 		//länge berechnen, falls angeforderte Menge größer als Liste
 		if ((fromIndex + aCnt) < len) {
@@ -91,25 +86,24 @@ var listea = (function(){
 
 		//Teil der Liste iterieren und die jeweiligen Listeneinträge erstellen
 		for (var i = fromIndex; i < len; i++) {
-			liAmount += _getHTMLRow(aData[i]);
+			liAmount += _getHTMLRow(i+1,aData[i]);
 			fromIndex++;
 		}
 
 		//Count merken
-		if ($('#list-listeaSearch').is(':visible')){
-			listeaSearchCnt = fromIndex;
-		} else {
-			listeaCnt = fromIndex;
-		}
+		listeaCnt = fromIndex;
 
 		return liAmount;
 	}
 
 	/* function _getHTMLLiElement (Ein Listenelement hinzufügen (aData = ein Listeneintrag)) */
-	function _getHTMLRow(aData){
+	function _getHTMLRow(aLfdNr,aData){
 		var li = '<tr>';
-		li += '<td>'+'<a data-ea-id="' + aData.ID + '" href="#">'+aData.ID+'</td>';
-		li += '<td>' + aData.Datum + '</td> ';
+		li += '<td>' + aLfdNr + '</td> ';
+		li += '<td>'+'<a data-ea-id="' + aData.id + '" href="#">'+aData.id+'</td>';
+		li += '<td>' + aData.datum + '</td> ';
+		li += '<td>' + aData.kurz + '</td> ';
+		li += '<td>' + aData.betrag + '</td> ';
 		return li += '</tr>';
 	}
 
@@ -131,7 +125,7 @@ var listea = (function(){
 				}
 
 				if  ((wintop/(docheight-winheight)) > scrolltrigger) {
-					$('#list-listea').append(_getHTMLLiElementAmount(listeaJSON.LISTEA, 20));
+					$('#list-listea').append(_getHTMLLiElementAmount(listeaJSON, 20));
 					$('#list-listea').listview().listview('refresh');
 					}
 		});
