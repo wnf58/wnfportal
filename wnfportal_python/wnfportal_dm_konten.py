@@ -178,6 +178,32 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
            'betrag': str(row[4])}
       # print(k)
       ea.append(k)
+    # print(ea)
+    return ea
+
+  def jsonListEASkip(self,aFirst, aSkip):
+    aSQL = """
+              SELECT FIRST %s SKIP %s E.ID,E.DATUM,E.KURZ, E.BEZ, E.BETRAG
+              FROM KO_KUBEA E
+              ORDER BY E.DATUM DESC,E.KURZ
+            """
+    aSQL = aSQL % (aFirst,aSkip)
+    # print(aSQL)
+    cur = self.sqlOpen(aSQL)
+    if (cur == None):
+      return []
+    ea = []
+    for row in cur:
+      s = "%s | %s" % (row[1].strftime("%d.%m.%y"), row[2])
+      ttmmjj = "%s" % (row[1].strftime("%d.%m.%y"))
+      # print s
+      k = {'id': row[0],
+           'datum': str(row[1]),
+           'kurz': row[2],
+           'bez': row[3],
+           'betrag': str(row[4])}
+      # print(k)
+      ea.append(k)
     print(ea)
     return ea
 

@@ -152,6 +152,12 @@ class wnfPortal(object):
 
   jsonListEA.exposed = True
 
+  def jsonListEASkip(self,aFirst, aSkip):
+    j = self.q.konten_list_ea_skip(aFirst,aSkip)
+    return j
+
+  jsonListEASkip.exposed = True
+
   def jsonDetailEA(self, id):
     j = self.q.konten_detail_ea(id)
     return j

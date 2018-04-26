@@ -73,6 +73,16 @@ class object_q(object):
       return json.dumps({})
 
   @cherrypy.expose
+  def konten_list_ea_skip(self, aFirst, aSkip):
+    if self.is_angemeldet():
+      k = wnfportal_dm_konten.dmKonten()
+      j = k.jsonListEASkip(aFirst, aSkip)
+      # print j
+      return json.dumps(j)
+    else:
+      return json.dumps({})
+
+  @cherrypy.expose
   def konten_kontostand(self):
     if self.is_angemeldet():
       k = wnfportal_dm_konten.dmKonten()

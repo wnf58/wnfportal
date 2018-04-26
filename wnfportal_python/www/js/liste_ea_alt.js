@@ -2,23 +2,12 @@
 var listea = (function(){
 	var listeaJSON = {};
 	var performed = false;
-  var aSkip = 0;
-  var aFirst = 10;
-  var aFertig = false;
 
 	/* function get (Informationen abfragen und Callback-Funktion aufrufen) */
-	function getfirst_ea(){
-	  aFertig=false;
+	function get(){
 		$("#listeaHeader").empty().append('xxxx');
 		$("#btn-listea-refresh").show();
-		aSkip = 0;
-		aFirst = 10;
-		fn.getJSONHerde(QUERY_LISTEA+'/'+aFirst+'/'+aSkip, '', _process);
-	}
-
-	function getnext_ea(){
-	  aFertig=false;
-		fn.getJSONHerde(QUERY_LISTEA+'/'+aFirst+'/'+aSkip, '', _process);
+		fn.getJSONHerde(QUERY_LISTEA,'', '', _process);
 	}
 
 	/* function setListEA (wird nach Einzeltiersuche aufgerufen, wenn mehrere Tiere gefunden wurden) */
@@ -45,9 +34,7 @@ var listea = (function(){
 			html += '<table id="list-listea" data-role="listview">';
 
 			//Listeneinträge hinzufügen
-			html += _getHTMLLiElementAmount(listeaJSON, aFirst);
-			aSkip += aFirst;
-			console.log(aFirst,aSkip);
+			html += _getHTMLLiElementAmount(listeaJSON, 20);
 
 		} else {
 			html = '<h3 class="centerText">Keine Daten vorhanden</h3>';
@@ -77,8 +64,6 @@ var listea = (function(){
 			}
 		}
 
-		aFertig = true;
-
 	}
 
 	/* function _getHTMLLiElementAmount (Menge von Listeneinträgen zurückliefern (aCnt = Anzahl Elemente)) */
@@ -96,7 +81,7 @@ var listea = (function(){
 
 		//Teil der Liste iterieren und die jeweiligen Listeneinträge erstellen
 		for (var i = fromIndex; i < len; i++) {
-			liAmount += _getHTMLRow(aSkip+i+1,aData[i]);
+			liAmount += _getHTMLRow(i+1,aData[i]);
 			fromIndex++;
 		}
 
@@ -134,16 +119,15 @@ var listea = (function(){
 					}
 				}
 
-				if  (((wintop/(docheight-winheight)) > scrolltrigger) && aFertig){
-				  getnext_ea();
-					$('#list-listea').append(_getHTMLLiElementAmount(listeaJSON, aFirst));
+				if  ((wintop/(docheight-winheight)) > scrolltrigger) {
+					$('#list-listea').append(_getHTMLLiElementAmount(listeaJSON, 20));
 					$('#list-listea').listview().listview('refresh');
 					}
 		});
 	}
 
 	return {
-		getfirst: getfirst,
+		get: get,
 		setListEA: setListEA,
 		performed: performed
 	};
