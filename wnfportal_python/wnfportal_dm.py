@@ -131,6 +131,16 @@ class object_q(object):
     else:
       return ''
 
+
+  @cherrypy.expose
+  def diagrammLetzterMonat_html(self):
+    if self.is_angemeldet():
+      k = wnfportal_dm_konten.dmKonten()
+      t = k.htmldiagrammLetzterMonat()
+      return t
+    else:
+      return ''
+
   @cherrypy.expose
   def konten_allejahre(self):
     if self.is_angemeldet():

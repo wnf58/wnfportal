@@ -10,6 +10,7 @@ import wnfportal_tools as T
 
 from reportlab.graphics.shapes import Drawing
 from reportlab.graphics.charts.barcharts import VerticalBarChart
+from reportlab.graphics.charts.piecharts import Pie
 from reportlab.graphics import renderPM
 
 
@@ -181,13 +182,13 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
     # print(ea)
     return ea
 
-  def jsonListEASkip(self,aFirst, aSkip):
+  def jsonListEASkip(self, aFirst, aSkip):
     aSQL = """
               SELECT FIRST %s SKIP %s E.ID,E.DATUM,E.KURZ, E.BEZ, E.BETRAG
               FROM KO_KUBEA E
               ORDER BY E.DATUM DESC,E.KURZ
             """
-    aSQL = aSQL % (aFirst,aSkip)
+    aSQL = aSQL % (aFirst, aSkip)
     # print(aSQL)
     cur = self.sqlOpen(aSQL)
     if (cur == None):
@@ -289,6 +290,27 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
             "<tr><th class=table-3c-spalte1></th><th class=table-3c-spalte2>Summe</th><th class=table-3c-spalte3>%s</th></tr>"
             "</table>") % (s, T.sDM(aSumme))
 
+  def htmldiagrammLetzterMonat(self):
+    aVon = T.wnfDateToSQL(T.wnfErsterTagVormonat())
+    aBis = T.wnfDateToSQL(T.wnfLetzterTagVormonat())
+    aSumme, aData, aLabels, aRecord = self.analyseAusgabenVonBis(aVon, aBis)
+    p = '/home/wnf/Entwicklung/PycharmProjects/wnfportal/wnfportal_python/www/img/'
+    dn = 'kreis_vormonat'
+    self.diagrammKostenartVonBis(p, dn, aData, aLabels)
+    s = ''
+    for l in aRecord:
+      aLabel = l['ID']
+      kurz = l['kurz']  # .encode('utf-8')
+      betrag = l['sDM']
+      s = '%s <tr><td class=table-3c-spalte1>%s</td><td class=table-3c-spalte2>%s</td><td class=table-3c-spalte3>%s</td></tr>' % (
+        s, aLabel, kurz, betrag)
+    tabelle = ("<table>"
+               "<tr><th class=table-3c-spalte1>Kurz</th><th class=table-3c-spalte2>Bezeichnung</th><th class=table-3c-spalte3>Betrag</th></tr>"
+               "%s"
+               "<tr><th class=table-3c-spalte1></th><th class=table-3c-spalte2>Summe</th><th class=table-3c-spalte3>%s</th></tr>"
+               "</table>") % (s, T.sDM(aSumme))
+    return ('<img src="img/%s.png" alt="Diagramm"> %s' % (dn, tabelle))
+
   def listeAlleJahreEA(self):
     aSumme = 0
     aAnzJahre = 0
@@ -324,6 +346,128 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
     if aAnzJahre > 0:
       aSumme = aSumme / aAnzJahre
     return aAnzJahre, aSumme, ea
+
+  def listeKostenartVonBis(self, aVon, aBis):
+    aSQL = """
+      SELECT ABS(SUM(E.BETRAG)),K.KURZ,K.ID 
+      FROM KO_KUBEA E
+      LEFT JOIN KO_KUBKST K ON K.ID=E.KST_ID
+      WHERE E.IGNORIEREN = 0
+      AND NOT E.KST_ID IS NULL
+      AND E.BETRAG < 0
+      AND E.DATUM BETWEEN %s AND %s
+      GROUP BY K.KURZ,K.ID
+      ORDER BY 2
+      """
+    aSQL = aSQL % (aVon, aBis)
+    print(aSQL)
+    cur = self.sqlOpen(aSQL)
+    if (cur == None):
+      return [], []
+    ea = []
+    kst = []
+    aRecord = []
+    aSumme = 0
+    for row in cur:
+      # s = "%s | %20s" % (row[0], T.sDM(row[1]))
+      # print s
+      ea.append(round(row[0]))
+      aSumme = aSumme + row[0]
+      kst.append(row[1])
+      k = {'betrag': row[0],
+           'sDM': T.sDM(row[0]),
+           'kurz': row[1],
+           'ID': row[2]
+           }
+      # print(aSumme)
+      aRecord.append(k)
+
+    return aSumme, ea, kst, aRecord
+
+  def analyseAusgabenVonBis10Prozent(self, aKst_ID, aVon, aBis, a10Prozent):
+    aSQL = """
+        SELECT SUM(ABS(E.BETRAG)),K.KURZ,K.ID 
+        FROM KO_KUBEA E
+        LEFT JOIN KO_KUBKAT K ON K.ID=E.KAT_ID
+        WHERE E.IGNORIEREN = 0
+        AND E.KST_ID = %d
+        AND E.BETRAG < 0
+        AND E.DATUM BETWEEN %s AND %s
+        GROUP BY K.KURZ,K.ID
+        ORDER BY 2
+        """
+    aSQL = aSQL % (aKst_ID, aVon, aBis)
+    print(aSQL)
+    cur = self.sqlOpen(aSQL)
+    if (cur == None):
+      return []
+    aRec = []
+    for row in cur:
+      x = {'betrag': row[0],
+           'sDM': T.sDM(row[0]),
+           'kurz': row[1],
+           'ID': aKst_ID
+           }
+      aRec.append(x)
+    return aRec
+
+  def analyseAusgabenVonBis(self, aVon, aBis):
+    """
+    Alle EA bis 10 % zusammenfassen
+    """
+    aSQL = """
+      SELECT ABS(SUM(E.BETRAG)),K.KURZ,K.ID 
+      FROM KO_KUBEA E
+      LEFT JOIN KO_KUBKST K ON K.ID=E.KST_ID
+      WHERE E.IGNORIEREN = 0
+      AND NOT E.KST_ID IS NULL
+      AND E.BETRAG < 0
+      AND E.DATUM BETWEEN %s AND %s
+      GROUP BY K.KURZ,K.ID
+      ORDER BY 2
+      """
+    aSQL = aSQL % (aVon, aBis)
+    print(aSQL)
+    cur = self.sqlOpen(aSQL)
+    if (cur == None):
+      return 0, [], [], []
+    ea = []
+    kst = []
+    aRecord = []
+    aRecKst = []
+    aSumme = 0
+    for row in cur:
+      # s = "%s | %20s" % (row[0], T.sDM(row[1]))
+      # print s
+      k = {'betrag': row[0],
+           'kurz': row[1],
+           'KST_ID': row[2]
+           }
+      aSumme = aSumme + row[0]
+      # print(aSumme)
+      aRecKst.append(k)
+    a10Prozent = aSumme / 10
+    print(aSumme, a10Prozent)
+
+    for k in aRecKst:
+      if (k['betrag'] < a10Prozent):
+        x = {'betrag': k['betrag'],
+             'sDM': T.sDM(k['betrag']),
+             'kurz': k['kurz'],
+             'ID': k['KST_ID']
+             }
+        aRecord.append(x)
+      else:
+        rx = self.analyseAusgabenVonBis10Prozent(k['KST_ID'], aVon, aBis, a10Prozent)
+        for x in rx:
+          aRecord.append(x)
+    print(aRecord)
+    for x in aRecord:
+      ea.append(round(x['betrag']))
+      kst.append(x['kurz'])
+    print(kst)
+    print(ea)
+    return aSumme, ea, kst, aRecord
 
   def listeAlleMonateEA(self):
     aSumme = 0
@@ -363,6 +507,20 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
       aSumme = aSumme / aAnzMonate
     return aAnzMonate, aSumme, ea
 
+  def diagrammKostenartVonBis(self, aPfad, aDateiname, aData, aLabels):
+    d = Drawing(800, 800)
+    pie = Pie()
+    pie.x = 360
+    pie.y = 360
+    pie.xradius = 300
+    pie.yradius = 300
+    pie.data = aData
+    pie.labels = aLabels
+    pie.slices.strokeWidth = 0.5
+    # pie.slices[3].popout = 20
+    d.add(pie)
+    d.save(formats=['png'], outDir=aPfad, fnRoot=aDateiname)
+
   def diagrammAlleJahreEA(self, aPngDateiname):
     # Festlegen der Gesamtgröße in Pixel
     d = Drawing(800, 600)
@@ -376,7 +534,7 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
     # Holen der Daten
     daten = []
     jahre = []
-    aSumme, ea = self.listeAlleJahreEA()
+    aAnzJahre, aSumme, ea = self.listeAlleJahreEA()
     print(ea)
     for x in ea:
       print
@@ -401,6 +559,7 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
     # Diagramm zeichnen
     d.add(diagramm)
     # ... und speichernhttp://www.reportlab.com/software/opensource/rl-toolkit/guide/
+    print(aPngDateiname)
     renderPM.drawToFile(d, aPngDateiname, 'PNG')
 
   def jsonAlleJahreEA(self):
@@ -523,7 +682,13 @@ def main():
   # print k.jsonAlleKonten()
   # print k.jsonLetzteEA()
   # print k.jsonAlleJahreEA()
-  print(k.htmlProjektWintergarten2017())
+  # print(k.htmlProjektWintergarten2017())
+  print(k.htmldiagrammLetzterMonat())
+  # k.analyseAusgabenVonBis(
+  #  T.wnfDateToSQL(T.wnfErsterTagVormonat()),
+  #  T.wnfDateToSQL(T.wnfLetzterTagVormonat()))
+  # k.diagrammKostenartVonBis('/wnfdaten/wnfpython/wnfportal/trunk/src/wnfportal/m/diagramme/', 'kreis_2018_09',
+  #                          '01.09.2018', '30.09.2018')
   # k.diagrammAlleJahreEA('/wnfdaten/wnfpython/wnfportal/trunk/src/wnfportal/m/diagramme/diagramm_alle_jahre.png')
   return 0
 
