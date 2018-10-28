@@ -7,6 +7,7 @@
 import configparser
 import locale
 from datetime import date, timedelta
+import calendar
 import os
 
 SECTION_SETUP = 'Setup'
@@ -25,11 +26,16 @@ def leseIniStr(ini, aSection, aName):
 def wnfHeute():
   return date.today()
 
+def wnfMonatslaenge(aDatum):
+  return calendar.monthrange(aDatum.year, aDatum.month)[1]
 
 def wnfErsterDieserMonat():
   heute = wnfHeute()
   return date(heute.year, heute.month, 1)
 
+def wnfLetzterDieserMonat():
+  heute = wnfHeute()
+  return date(heute.year, heute.month, wnfMonatslaenge(heute))
 
 def wnfLetzterTagVormonat():
   return wnfErsterDieserMonat() - timedelta(1)

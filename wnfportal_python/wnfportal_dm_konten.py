@@ -290,12 +290,9 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
             "<tr><th class=table-3c-spalte1></th><th class=table-3c-spalte2>Summe</th><th class=table-3c-spalte3>%s</th></tr>"
             "</table>") % (s, T.sDM(aSumme))
 
-  def htmldiagrammLetzterMonat(self):
-    aVon = T.wnfDateToSQL(T.wnfErsterTagVormonat())
-    aBis = T.wnfDateToSQL(T.wnfLetzterTagVormonat())
+  def htmldiagrammVonBis(self, aVon, aBis, dn):
     aSumme, aData, aLabels, aRecord = self.analyseAusgabenVonBis(aVon, aBis)
     p = '/home/wnf/Entwicklung/PycharmProjects/wnfportal/wnfportal_python/www/img/'
-    dn = 'kreis_vormonat'
     self.diagrammKostenartVonBis(p, dn, aData, aLabels)
     s = ''
     for l in aRecord:
@@ -310,6 +307,18 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
                "<tr><th class=table-3c-spalte1></th><th class=table-3c-spalte2>Summe</th><th class=table-3c-spalte3>%s</th></tr>"
                "</table>") % (s, T.sDM(aSumme))
     return ('<img src="img/%s.png" alt="Diagramm"> %s' % (dn, tabelle))
+
+  def htmldiagrammLetzterMonat(self):
+    aVon = T.wnfDateToSQL(T.wnfErsterTagVormonat())
+    aBis = T.wnfDateToSQL(T.wnfLetzterTagVormonat())
+    dn = 'kreis_vormonat'
+    return self.htmldiagrammVonBis(aVon, aBis, dn)
+
+  def htmldiagrammDieserMonat(self):
+    aVon = T.wnfDateToSQL(T.wnfErsterDieserMonat())
+    aBis = T.wnfDateToSQL(T.wnfLetzterDieserMonat())
+    dn = 'kreis_diesermonat'
+    return self.htmldiagrammVonBis(aVon, aBis, dn)
 
   def listeAlleJahreEA(self):
     aSumme = 0
@@ -384,7 +393,7 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
 
     return aSumme, ea, kst, aRecord
 
-  def analyseAusgabenVonBis10Prozent(self, aKst_ID, aVon, aBis, a10Prozent):
+  def analyseAusgabenVonBis10Prozent(self, aKst_ID, aKst_Kurz, aVon, aBis, a10Prozent):
     aSQL = """
         SELECT SUM(ABS(E.BETRAG)),K.KURZ,K.ID 
         FROM KO_KUBEA E
@@ -402,10 +411,21 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
     if (cur == None):
       return []
     aRec = []
+    aRest = 0
     for row in cur:
-      x = {'betrag': row[0],
-           'sDM': T.sDM(row[0]),
-           'kurz': row[1],
+      if (row[0] > a10Prozent):
+        x = {'betrag': row[0],
+             'sDM': T.sDM(row[0]),
+             'kurz': '%s - %s' % (aKst_Kurz, row[1]),
+             'ID': aKst_ID
+             }
+        aRec.append(x)
+      else:
+        aRest = aRest + row[0]
+    if aRest > 0:
+      x = {'betrag': aRest,
+           'sDM': T.sDM(aRest),
+           'kurz': '%s' % (aKst_Kurz),
            'ID': aKst_ID
            }
       aRec.append(x)
@@ -458,7 +478,7 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
              }
         aRecord.append(x)
       else:
-        rx = self.analyseAusgabenVonBis10Prozent(k['KST_ID'], aVon, aBis, a10Prozent)
+        rx = self.analyseAusgabenVonBis10Prozent(k['KST_ID'], k['kurz'], aVon, aBis, a10Prozent)
         for x in rx:
           aRecord.append(x)
     print(aRecord)
@@ -683,7 +703,8 @@ def main():
   # print k.jsonLetzteEA()
   # print k.jsonAlleJahreEA()
   # print(k.htmlProjektWintergarten2017())
-  print(k.htmldiagrammLetzterMonat())
+  # print(k.htmldiagrammLetzterMonat())
+  print(k.htmldiagrammDieserMonat())
   # k.analyseAusgabenVonBis(
   #  T.wnfDateToSQL(T.wnfErsterTagVormonat()),
   #  T.wnfDateToSQL(T.wnfLetzterTagVormonat()))

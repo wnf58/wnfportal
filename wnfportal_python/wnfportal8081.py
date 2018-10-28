@@ -82,6 +82,7 @@ class wnfPortal(object):
       "  <li><a href=kontostandLetzterMonat>Kontostand Letzter Monat</a></li>"
       "  <li><a href=projektWintergarten2017>Projekt Wintergarten 2017</a></li>"
       "  <li><a href=diagrammLetzterMonat>Diagramm letzter Monat</a></li>"
+      "  <li><a href=diagrammDieserMonat>Diagramm dieser Monat</a></li>"
       "</ul>"
     )
     f = wnfHTMLFuss()
@@ -136,6 +137,14 @@ class wnfPortal(object):
     return "%s%s%s" % (k, b, f)
 
   diagrammLetzterMonat.exposed = True
+
+  def diagrammDieserMonat(self):
+    k = wnfHTMLKopf('Ausgaben dieser Monat', 'Ausgaben dieser Monat')
+    b = self.q.diagrammDieserMonat_html()
+    f = wnfHTMLFuss()
+    return "%s%s%s" % (k, b, f)
+
+  diagrammDieserMonat.exposed = True
 
   def projektWintergarten2017(self):
     k = wnfHTMLKopf('Projekt Wintergarten 2017', 'Projekt Wintergarten 2017')
