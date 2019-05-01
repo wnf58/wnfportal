@@ -11,10 +11,13 @@
 import os
 import cherrypy
 import json
+from bottle import template
 from wnfportal_dm import object_q
+import wnfportal_dm_konten
 
 ENTWICKLUNG = True
 
+www = os.path.join(os.path.dirname(os.path.abspath(__file__)),'www')
 
 # Dict zur Steuerung des Servers
 def server_dict():
@@ -33,7 +36,9 @@ def server_dict():
   else:
     g['environment'] = "production"
   c = {'global': g}
-  c['/'] = {'tools.staticdir.on': True, 'tools.staticdir.dir': "www", 'tools.staticdir.index': "index.html"}
+  c['/'] = {'tools.staticdir.on': True,
+            'tools.staticdir.dir': "www",
+            'tools.staticdir.index': "index.html"}
   # c['/']={'tools.staticdir.on':True,'tools.staticdir.dir':"m",'tools.staticdir.index' : "index.html"}
   # für put-Anweisungen
   c['/put_url'] = {'tools.response_headers.on': True,
@@ -81,7 +86,9 @@ class wnfPortal(object):
       "  <li><a href=kontostandAlleMonate>Kontostand alle Monate</a></li>"
       "  <li><a href=kontostandLetzterMonat>Kontostand Letzter Monat</a></li>"
       "  <li><a href=projektWintergarten2017>Projekt Wintergarten 2017</a></li>"
+      "  <li><a href=diagrammKontoVerlauf>Diagramm Kontoverlauf</a></li>"
       "  <li><a href=diagrammLetzterMonat>Diagramm letzter Monat</a></li>"
+      "  <li><a href=diagrammLetzte12Monate>Diagramm letzte 12 Monate</a></li>"
       "  <li><a href=diagrammDieserMonat>Diagramm dieser Monat</a></li>"
       "</ul>"
     )
@@ -137,6 +144,25 @@ class wnfPortal(object):
     return "%s%s%s" % (k, b, f)
 
   diagrammLetzterMonat.exposed = True
+
+  def diagrammKontoVerlauf(self):
+    dn = os.path.join(www,'daten','kontoverlauf.csv')
+    k = wnfportal_dm_konten.dmKonten()
+    k.csvKontoVerlauf(dn)
+    output = template('konto_verlauf',
+                      title='Kontoverlauf'
+                      )
+    return output
+
+  diagrammKontoVerlauf.exposed = True
+
+  def diagrammLetzte12Monate(self):
+    k = wnfHTMLKopf('Ausgaben letzte 12 Monate', 'Ausgaben letzte 12 Monate')
+    b = self.q.diagrammLetzte12Monate_html()
+    f = wnfHTMLFuss()
+    return "%s%s%s" % (k, b, f)
+
+  diagrammLetzte12Monate.exposed = True
 
   def diagrammDieserMonat(self):
     k = wnfHTMLKopf('Ausgaben dieser Monat', 'Ausgaben dieser Monat')

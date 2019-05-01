@@ -31,7 +31,7 @@ class object_q(object):
       summe = T.sDM(k.summeAlleKonten())
       s = ''
       for l in k.listeAlleKonten():
-        konto = l['konto'] #.encode('utf-8')
+        konto = l['konto']  # .encode('utf-8')
         saldo = l['saldo']
         # print type(konto),konto
         s = '%s <tr><td class=table-left>%s</td><td class=table-right-currency>%s</td></tr>' % (s, konto, saldo)
@@ -48,6 +48,7 @@ class object_q(object):
            "<table>"
            "<tr><th class=table-left><a href=/projektWintergarten2017 >Projekt Wintergarten 2017</a></th><th class=table-right-currency>%s</th></tr>"
            "</table>") % (s, summe)
+      k.closeConnection
       return s
     else:
       return ""
@@ -113,7 +114,7 @@ class object_q(object):
       return json.dumps({})
 
   @cherrypy.expose
-  def konten_detail_ea(self,id):
+  def konten_detail_ea(self, id):
     if self.is_angemeldet():
       k = wnfportal_dm_konten.dmKonten()
       j = k.jsonDetailEA(id)
@@ -131,12 +132,29 @@ class object_q(object):
     else:
       return ''
 
-
   @cherrypy.expose
   def diagrammLetzterMonat_html(self):
     if self.is_angemeldet():
       k = wnfportal_dm_konten.dmKonten()
       t = k.htmldiagrammLetzterMonat()
+      return t
+    else:
+      return ''
+
+  @cherrypy.expose
+  def diagrammKontoVerlauf_html(self):
+    if self.is_angemeldet():
+      k = wnfportal_dm_konten.dmKonten()
+      t = k.htmldiagrammKontoVerlauf()
+      return t
+    else:
+      return ''
+
+  @cherrypy.expose
+  def diagrammLetzte12Monate_html(self):
+    if self.is_angemeldet():
+      k = wnfportal_dm_konten.dmKonten()
+      t = k.htmldiagrammLetzte12Monate()
       return t
     else:
       return ''

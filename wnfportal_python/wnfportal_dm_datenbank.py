@@ -68,6 +68,10 @@ class dmDatenbank(object):
     cur.execute(aSQL)
     return cur
 
+  def closeConnection(self):
+    self.Con.close()
+    self.Verbunden = False
+
 
 def main():
   d = dmDatenbank()

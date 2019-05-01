@@ -7,7 +7,7 @@ import os
 import configparser
 import wnfportal_dm_datenbank
 import wnfportal_tools as T
-
+import time
 from reportlab.graphics.shapes import Drawing
 from reportlab.graphics.charts.barcharts import VerticalBarChart
 from reportlab.graphics.charts.piecharts import Pie
@@ -314,11 +314,58 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
     dn = 'kreis_vormonat'
     return self.htmldiagrammVonBis(aVon, aBis, dn)
 
+  def htmldiagrammLetzte12Monate(self):
+    aVon = T.wnfDateToSQL(T.wnfErsterVor12Monaten())
+    aBis = T.wnfDateToSQL(T.wnfHeute())
+    dn = 'kreis_12Monate'
+    return self.htmldiagrammVonBis(aVon, aBis, dn)
+
   def htmldiagrammDieserMonat(self):
     aVon = T.wnfDateToSQL(T.wnfErsterDieserMonat())
     aBis = T.wnfDateToSQL(T.wnfLetzterDieserMonat())
     dn = 'kreis_diesermonat'
     return self.htmldiagrammVonBis(aVon, aBis, dn)
+
+  def csvKontoVerlauf(self,dn):
+    # Die Datei wird nur alle Minute neu geschrieben
+    if os.path.exists(dn):
+        if (time.time() - os.path.getmtime(dn)<60):
+            return
+        os.remove(dn)
+    print(dn)
+    with open(dn, 'x') as out:
+        s = 'Datum,Kontostand'
+        out.write(s + '\n')
+    # alle Monate
+    aSQL = 'SELECT MIN(E.DATUM),MAX(E.DATUM) FROM KO_KUBEA E'
+    cur = self.sqlOpen(aSQL)
+    if (cur == None):
+      return
+    for row in cur:
+        aVon = row[0]
+        aBis = row[1]
+    while (aVon < aBis):
+        aVon = T.ersterNaechsterMonat(aVon)
+        # print(aVon)
+        aSQL = """
+            SELECT
+            SUM(E.BETRAG)
+            FROM KO_KUBEA E 
+            WHERE E.DATUM < '%s'
+            """ % (aVon)
+        # print(aSQL)
+        cur = self.sqlOpen(aSQL)
+        if (cur == None):
+          return
+        for row in cur:
+          betrag = row[0]
+          s = aVon.strftime("%Y/%m/%d")
+          s = "%s,%s" % (s, betrag)
+          print(s)
+          with open(dn, 'a') as out:
+            out.write(s + '\n')
+    return
+
 
   def listeAlleJahreEA(self):
     aSumme = 0
@@ -466,7 +513,7 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
       aSumme = aSumme + row[0]
       # print(aSumme)
       aRecKst.append(k)
-    a10Prozent = aSumme / 10
+    a10Prozent = aSumme / 20
     print(aSumme, a10Prozent)
 
     for k in aRecKst:
@@ -487,6 +534,7 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
       kst.append(x['kurz'])
     print(kst)
     print(ea)
+    self.closeConnection()
     return aSumme, ea, kst, aRecord
 
   def listeAlleMonateEA(self):
@@ -704,7 +752,8 @@ def main():
   # print k.jsonAlleJahreEA()
   # print(k.htmlProjektWintergarten2017())
   # print(k.htmldiagrammLetzterMonat())
-  print(k.htmldiagrammDieserMonat())
+  # print(k.htmldiagrammDieserMonat())
+  k.csvKontoVerlauf('/home/wnf/Entwicklung/PycharmProjects/wnfportal/wnfportal_python/www/daten/kontoverlauf.csv')
   # k.analyseAusgabenVonBis(
   #  T.wnfDateToSQL(T.wnfErsterTagVormonat()),
   #  T.wnfDateToSQL(T.wnfLetzterTagVormonat()))
