@@ -13,6 +13,9 @@ from reportlab.graphics.charts.barcharts import VerticalBarChart
 from reportlab.graphics.charts.piecharts import Pie
 from reportlab.graphics import renderPM
 
+import altair as alt
+
+
 
 class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
   def __init__(self):
@@ -326,46 +329,45 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
     dn = 'kreis_diesermonat'
     return self.htmldiagrammVonBis(aVon, aBis, dn)
 
-  def csvKontoVerlauf(self,dn):
+  def csvKontoVerlauf(self, dn):
     # Die Datei wird nur alle Minute neu geschrieben
     if os.path.exists(dn):
-        if (time.time() - os.path.getmtime(dn)<60):
-            return
-        os.remove(dn)
+      if (time.time() - os.path.getmtime(dn) < 60):
+        return
+      os.remove(dn)
     print(dn)
     with open(dn, 'x') as out:
-        s = 'Datum,Kontostand'
-        out.write(s + '\n')
+      s = 'Datum,Kontostand'
+      out.write(s + '\n')
     # alle Monate
     aSQL = 'SELECT MIN(E.DATUM),MAX(E.DATUM) FROM KO_KUBEA E'
     cur = self.sqlOpen(aSQL)
     if (cur == None):
       return
     for row in cur:
-        aVon = row[0]
-        aBis = row[1]
+      aVon = row[0]
+      aBis = row[1]
     while (aVon < aBis):
-        aVon = T.ersterNaechsterMonat(aVon)
-        # print(aVon)
-        aSQL = """
+      aVon = T.ersterNaechsterMonat(aVon)
+      # print(aVon)
+      aSQL = """
             SELECT
             SUM(E.BETRAG)
             FROM KO_KUBEA E 
             WHERE E.DATUM < '%s'
             """ % (aVon)
-        # print(aSQL)
-        cur = self.sqlOpen(aSQL)
-        if (cur == None):
-          return
-        for row in cur:
-          betrag = row[0]
-          s = aVon.strftime("%Y/%m/%d")
-          s = "%s,%s" % (s, betrag)
-          print(s)
-          with open(dn, 'a') as out:
-            out.write(s + '\n')
+      # print(aSQL)
+      cur = self.sqlOpen(aSQL)
+      if (cur == None):
+        return
+      for row in cur:
+        betrag = row[0]
+        s = aVon.strftime("%Y/%m/%d")
+        s = "%s,%s" % (s, betrag)
+        print(s)
+        with open(dn, 'a') as out:
+          out.write(s + '\n')
     return
-
 
   def listeAlleJahreEA(self):
     aSumme = 0
@@ -575,6 +577,51 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
       aSumme = aSumme / aAnzMonate
     return aAnzMonate, aSumme, ea
 
+  def openAlleMonateEinkommen(self):
+    aSQL = """
+            SELECT
+            EXTRACT(YEAR FROM E.DATUM) AS JAHR,
+            EXTRACT(MONTH FROM E.DATUM) AS MONAT,
+            SUM(E.BETRAG),
+            SUM(CASE WHEN E.KAT_ID = 22 THEN E.BETRAG END) AS Uwe, 
+            SUM(CASE WHEN E.KAT_ID = 24 THEN E.BETRAG END) AS Sabine 
+            FROM KO_KUBEA E
+            WHERE E.IGNORIEREN = 0
+            AND E.BETRAG > 1000
+            AND E.KST_ID = 11
+            AND E.KAT_ID IN (22,24)
+            GROUP BY EXTRACT(YEAR FROM E.DATUM),EXTRACT(MONTH FROM E.DATUM)
+            ORDER BY 1 DESC,2 DESC
+          """
+    # print(aSQL)
+    return self.sqlOpen(aSQL)
+
+
+  def listeAlleMonateEinkommen(self):
+    aSumme = 0
+    aAnzMonate = 0
+    cur = self.openAlleMonateEinkommen()
+    if (cur == None):
+      return aAnzMonate, aSumme, []
+    ea = []
+    for row in cur:
+      s = "%s | %20s" % (row[0], T.sDM(row[1]))
+      # print s
+      k = {'jahr': row[0],
+           'monat': row[1],
+           'betrag': row[2],
+           'sDMG': T.sDM(row[2]),
+           'sDMU': T.sDM(row[3]),
+           'sDMS': T.sDM(row[4])
+           }
+      aSumme = aSumme + row[2]
+      aAnzMonate = aAnzMonate + 1
+      # print k
+      ea.append(k)
+    if aAnzMonate > 0:
+      aSumme = aSumme / aAnzMonate
+    return aAnzMonate, aSumme, ea
+
   def diagrammKostenartVonBis(self, aPfad, aDateiname, aData, aLabels):
     d = Drawing(800, 800)
     pie = Pie()
@@ -606,6 +653,47 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
     print(ea)
     for x in ea:
       print
+      x['betrag'], x['jahr']
+      daten.append(float(x['betrag']))
+      jahre.append(str(x['jahr']))
+    ymin = min(daten)
+    ymax = max(daten)
+    # Daten für das Diagramm müssen als Liste von Tupeln vorliegen
+    daten = [tuple(daten)]
+    print(daten)
+    print(jahre)
+    # return False
+    # Hinzufügen der Daten
+    diagramm.data = daten
+    # Y-Achse (in ReportLab „valueAxis“) formatieren
+    diagramm.valueAxis.valueMin = ymin
+    diagramm.valueAxis.valueMax = ymax
+    diagramm.valueAxis.valueStep = 2000
+    # X-Achse (in ReportLab „categoryAxis“) formatieren
+    diagramm.categoryAxis.categoryNames = jahre
+    # Diagramm zeichnen
+    d.add(diagramm)
+    # ... und speichernhttp://www.reportlab.com/software/opensource/rl-toolkit/guide/
+    print(aPngDateiname)
+    renderPM.drawToFile(d, aPngDateiname, 'PNG')
+
+  def diagrammAlleMonateEinkommen(self, aPngDateiname):
+    # Festlegen der Gesamtgröße in Pixel
+    d = Drawing(800, 600)
+    # Anlegen des Diagramms
+    diagramm = VerticalBarChart()
+    # Positionierung und Größe des Diagramms
+    diagramm.x = 50
+    diagramm.y = 50
+    diagramm.width = 700
+    diagramm.height = 500
+    # Holen der Daten
+    daten = []
+    jahre = []
+    aAnzJahre, aSumme, ea = self.listeAlleMonateEinkommen()
+    print(ea)
+    for x in ea:
+      # print (x)
       x['betrag'], x['jahr']
       daten.append(float(x['betrag']))
       jahre.append(str(x['jahr']))
@@ -685,6 +773,28 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
             "<tr><th class=table-left>Durchschnitt für %d Monate</th><th class=table-right-currency></th><th class=table-right-currency></th><th class=table-right-currency>%s</th></tr>"
             "</table>") % (s, aAnzahl, T.sDM(aSumme))
 
+  def htmlAlleMonateEinkommen(self):
+    aAnzahl, aSumme, ea = self.listeAlleMonateEinkommen()
+    s = ''
+    for l in ea:
+      monat = "%2d/%d" % (l['monat'], l['jahr'])
+      betrag = l['betrag']
+      sDMG = l['sDMG']
+      sDMU = l['sDMU']
+      sDMS = l['sDMS']
+      if (betrag < 0):
+        aKlasse = 'class=table-right-currency-red'
+      else:
+        aKlasse = 'class=table-right-currency'
+      # print type(konto),konto
+      s = '%s <tr><td class=table-left>%s</td><td class=table-right-currency>%s</td><td class=table-right-currency>%s</td><td %s>%s</td></tr>' % (
+        s, monat, sDMU, sDMS, aKlasse, sDMG)
+    return ("<table>"
+            "<tr><th class=table-left>Monat</th><th class=table-right-currency>Uwe</th><th class=table-right-currency>Sabine</th><th class=table-right-currency>Gesamt</th></tr>"
+            "%s"
+            "<tr><th class=table-left>Durchschnitt für %d Monate</th><th class=table-right-currency></th><th class=table-right-currency></th><th class=table-right-currency>%s</th></tr>"
+            "</table>") % (s, aAnzahl, T.sDM(aSumme))
+
   def getProjekt_ID(self, aKurz):
     aSQL = "SELECT MAX(ID) FROM KO_KUBPROJEKT P WHERE P.KURZ='%s'"
     aSQL = aSQL % (aKurz)
@@ -745,6 +855,7 @@ def main():
   k = dmKonten()
   # print k.summeAlleKonten()
   # print k.listeAlleKonten()
+  # print (k.listeAlleMonateEinkommen())
   # print k.listeAlleJahreEA()
   # print k.listeProjektK(1)
   # print k.jsonAlleKonten()
@@ -753,13 +864,15 @@ def main():
   # print(k.htmlProjektWintergarten2017())
   # print(k.htmldiagrammLetzterMonat())
   # print(k.htmldiagrammDieserMonat())
-  k.csvKontoVerlauf('/home/wnf/Entwicklung/PycharmProjects/wnfportal/wnfportal_python/www/daten/kontoverlauf.csv')
+  # k.csvKontoVerlauf('/home/wnf/Entwicklung/PycharmProjects/wnfportal/wnfportal_python/www/daten/kontoverlauf.csv')
   # k.analyseAusgabenVonBis(
   #  T.wnfDateToSQL(T.wnfErsterTagVormonat()),
   #  T.wnfDateToSQL(T.wnfLetzterTagVormonat()))
   # k.diagrammKostenartVonBis('/wnfdaten/wnfpython/wnfportal/trunk/src/wnfportal/m/diagramme/', 'kreis_2018_09',
   #                          '01.09.2018', '30.09.2018')
   # k.diagrammAlleJahreEA('/wnfdaten/wnfpython/wnfportal/trunk/src/wnfportal/m/diagramme/diagramm_alle_jahre.png')
+  #k.diagrammAlleJahreEinkommen(
+  #  '/wnfdaten/wnfpython/wnfportal/trunk/src/wnfportal/m/diagramme/diagramm_alle_jahre_ek.png')
   return 0
 
 

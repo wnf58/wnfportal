@@ -73,7 +73,7 @@ def wnfHTMLFuss():
 class wnfPortal(object):
   def __init__(self):
     self.q = object_q()
-    print(dir(self.q))
+    #print(dir(self.q))
 
   def index(self):
     k = wnfHTMLKopf('', 'wnfPortal')
@@ -84,6 +84,7 @@ class wnfPortal(object):
       "  <li><a href=kontostand>Kontostand</a></li>"
       "  <li><a href=kontostandAlleJahre>Kontostand alle Jahre</a></li>"
       "  <li><a href=kontostandAlleMonate>Kontostand alle Monate</a></li>"
+      "  <li><a href=einkommenAlleMonate>Einkommen alle Monate</a></li>"
       "  <li><a href=kontostandLetzterMonat>Kontostand Letzter Monat</a></li>"
       "  <li><a href=projektWintergarten2017>Projekt Wintergarten 2017</a></li>"
       "  <li><a href=diagrammKontoVerlauf>Diagramm Kontoverlauf</a></li>"
@@ -127,6 +128,24 @@ class wnfPortal(object):
     return "%s%s%s" % (k, b, f)
 
   kontostandAlleMonate.exposed = True
+
+  def nvd3tpl(self,aUeberschrift):
+    aCaption = 'XXX'
+    aLabels = "'Jan', 'Feb', 'Mar'"
+    aData = " 4000 , 5000 , 6000"
+    output = template('chart.tpl',
+                      title=aCaption,
+                      Ueberschrift=aUeberschrift,
+                      Labels=(aLabels),
+                      Data=aData
+                      )
+    return output
+
+  def einkommenAlleMonate(self):
+    t = self.nvd3tpl('Einkommen alle Monate')
+    return t
+
+  einkommenAlleMonate.exposed = True
 
 
   def kontostandLetzterMonat(self):
@@ -222,7 +241,7 @@ class wnfPortal(object):
 
   @cherrypy.expose
   def submit(self, name):
-    print(name)
+    # print(name)
     k = [{'title': name}]
     j = json.dumps(k)
     return j

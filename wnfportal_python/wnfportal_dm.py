@@ -199,6 +199,16 @@ class object_q(object):
       return ""
 
   @cherrypy.expose
+  def einkommen_allemonate_html(self):
+    if self.is_angemeldet():
+      k = wnfportal_dm_konten.dmKonten()
+      t = k.htmlAlleMonateEinkommen()
+      # print t
+      return t
+    else:
+      return ""
+
+  @cherrypy.expose
   def projektWintergarten2017html(self):
     if self.is_angemeldet():
       k = wnfportal_dm_konten.dmKonten()

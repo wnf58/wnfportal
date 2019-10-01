@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>{title}</title>
+    <title>{{title or 'Kontoverlauf'}}</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, user-scalable=yes"/>
 
@@ -32,8 +32,8 @@
 </head>
 <body>
 <div class="bg-div">
-    <img class="logo-img" height="80" alt="dsp-logo" src="/img/wetter_logo.png"/>
-    <div class="logo-text">wnf Wetterserver</div>
+    <img class="logo-img" height="80" alt="wnfPortal-logo" src="/img/wlsoft_logo_weißer_kreis_120x120.svg"/>
+    <div class="logo-text">wnfPortal</div>
 </div>
 <hr/>
 <h1>Kontoverlauf</h1>
