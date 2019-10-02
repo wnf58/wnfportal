@@ -12,6 +12,8 @@ import os
 import cherrypy
 import json
 from bottle import template
+from pygments.lexers import _automodule
+
 from wnfportal_dm import object_q
 import wnfportal_dm_konten
 
@@ -85,6 +87,7 @@ class wnfPortal(object):
       "  <li><a href=kontostandAlleJahre>Kontostand alle Jahre</a></li>"
       "  <li><a href=kontostandAlleMonate>Kontostand alle Monate</a></li>"
       "  <li><a href=einkommenAlleMonate>Einkommen alle Monate</a></li>"
+      "  <li><a href=einkommenAlleJahre>Einkommen alle Jahre</a></li>"
       "  <li><a href=kontostandLetzterMonat>Kontostand Letzter Monat</a></li>"
       "  <li><a href=projektWintergarten2017>Projekt Wintergarten 2017</a></li>"
       "  <li><a href=diagrammKontoVerlauf>Diagramm Kontoverlauf</a></li>"
@@ -129,23 +132,31 @@ class wnfPortal(object):
 
   kontostandAlleMonate.exposed = True
 
-  def nvd3tpl(self,aUeberschrift):
-    aCaption = 'XXX'
-    aLabels = "'Jan', 'Feb', 'Mar'"
-    aData = " 4000 , 5000 , 6000"
+  def charttpl(self,aUeberschrift,aLabels,aEKU,aEKS):
+    print(aLabels)
+    aCaption = aUeberschrift
     output = template('chart.tpl',
                       title=aCaption,
                       Ueberschrift=aUeberschrift,
                       Labels=(aLabels),
-                      Data=aData
+                      EKU=aEKU,
+                      EKS=aEKS
                       )
     return output
 
   def einkommenAlleMonate(self):
-    t = self.nvd3tpl('Einkommen alle Monate')
+    aLabels,aEKU,aEKS = self.q.einkommen_allemonate_chartjs()
+    t = self.charttpl('Einkommen alle Monate',aLabels,aEKU,aEKS)
     return t
 
   einkommenAlleMonate.exposed = True
+
+  def einkommenAlleJahre(self):
+    aLabels,aEKU,aEKS = self.q.einkommen_allejahre_chartjs()
+    t = self.charttpl('Einkommen alle Jahre',aLabels,aEKU,aEKS)
+    return t
+
+  einkommenAlleJahre.exposed = True
 
 
   def kontostandLetzterMonat(self):

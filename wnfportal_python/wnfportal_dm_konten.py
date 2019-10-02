@@ -16,7 +16,6 @@ from reportlab.graphics import renderPM
 import altair as alt
 
 
-
 class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
   def __init__(self):
     wnfportal_dm_datenbank.dmDatenbank.__init__(self)
@@ -579,7 +578,8 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
 
   def openAlleMonateEinkommen(self):
     aSQL = """
-            SELECT
+            SELECT 
+            FIRST 240
             EXTRACT(YEAR FROM E.DATUM) AS JAHR,
             EXTRACT(MONTH FROM E.DATUM) AS MONAT,
             SUM(E.BETRAG),
@@ -596,6 +596,72 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
     # print(aSQL)
     return self.sqlOpen(aSQL)
 
+  def openAlleJahreEinkommen(self):
+    aSQL = """
+            SELECT 
+            EXTRACT(YEAR FROM E.DATUM) AS JAHR,
+            SUM(E.BETRAG),
+            SUM(CASE WHEN E.KAT_ID = 22 THEN E.BETRAG END) AS Uwe, 
+            SUM(CASE WHEN E.KAT_ID = 24 THEN E.BETRAG END) AS Sabine 
+            FROM KO_KUBEA E
+            WHERE E.IGNORIEREN = 0
+            AND E.KST_ID = 11
+            AND E.KAT_ID IN (22,24)
+            GROUP BY EXTRACT(YEAR FROM E.DATUM)
+            ORDER BY 1 DESC,2 DESC
+          """
+    # print(aSQL)
+    return self.sqlOpen(aSQL)
+
+
+
+  def chartjsAlleMonateEinkommen(self):
+    """
+    aLabels = "'Jan', 'Feb', 'Mar'"
+    aEKU = " 1000 , 1500 , 2000"
+    aEKS = " 4000 , 5000 , 6000"
+    """
+    aLabels = ''
+    aEKU = ''
+    aEKS = ''
+    cur = self.openAlleMonateEinkommen()
+    if (cur == None):
+      return aLabels, aEKU, aEKS
+    for row in cur:
+      if aLabels!='':
+        aLabels = ', ' + aLabels
+      aLabels = ("'%s/%s'%s") % (row[1],row[0],aLabels)
+      if aEKU != '':
+        aEKU = ', ' + aEKU
+      aEKU = ("%s %s") % (row[3],aEKU)
+      if aEKS != '':
+        aEKS = ', ' + aEKS
+      aEKS = ("%s %s") % (row[4],aEKS)
+    return aLabels, aEKU, aEKS
+
+  def chartjsAlleJahreEinkommen(self):
+    """
+    aLabels = "'Jan', 'Feb', 'Mar'"
+    aEKU = " 1000 , 1500 , 2000"
+    aEKS = " 4000 , 5000 , 6000"
+    """
+    aLabels = ''
+    aEKU = ''
+    aEKS = ''
+    cur = self.openAlleJahreEinkommen()
+    if (cur == None):
+      return aLabels, aEKU, aEKS
+    for row in cur:
+      if aLabels!='':
+        aLabels = ', ' + aLabels
+      aLabels = ("'%s'%s") % (row[0],aLabels)
+      if aEKU != '':
+        aEKU = ', ' + aEKU
+      aEKU = ("%s %s") % (row[2],aEKU)
+      if aEKS != '':
+        aEKS = ', ' + aEKS
+      aEKS = ("%s %s") % (row[3],aEKS)
+    return aLabels, aEKU, aEKS
 
   def listeAlleMonateEinkommen(self):
     aSumme = 0
@@ -622,6 +688,7 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
       aSumme = aSumme / aAnzMonate
     return aAnzMonate, aSumme, ea
 
+
   def diagrammKostenartVonBis(self, aPfad, aDateiname, aData, aLabels):
     d = Drawing(800, 800)
     pie = Pie()
@@ -635,6 +702,7 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
     # pie.slices[3].popout = 20
     d.add(pie)
     d.save(formats=['png'], outDir=aPfad, fnRoot=aDateiname)
+
 
   def diagrammAlleJahreEA(self, aPngDateiname):
     # Festlegen der Gesamtgröße in Pixel
@@ -677,6 +745,7 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
     print(aPngDateiname)
     renderPM.drawToFile(d, aPngDateiname, 'PNG')
 
+
   def diagrammAlleMonateEinkommen(self, aPngDateiname):
     # Festlegen der Gesamtgröße in Pixel
     d = Drawing(800, 600)
@@ -718,10 +787,12 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
     print(aPngDateiname)
     renderPM.drawToFile(d, aPngDateiname, 'PNG')
 
+
   def jsonAlleJahreEA(self):
     aSumme, ea = self.listeAlleJahreEA()
     j = {'summe': T.sDM(aSumme), 'ea': ea}
     return j
+
 
   def htmlAlleJahreEA(self):
     aAnzahl, aSumme, ea = self.listeAlleJahreEA()
@@ -751,6 +822,7 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
             "<tr><th class=table-left>Durchschnitt</th><th class=table-right-currency>%s</th></tr>"
             "</table>") % (s, T.sDM(aSumme))
 
+
   def htmlAlleMonateEA(self):
     aAnzahl, aSumme, ea = self.listeAlleMonateEA()
     s = ''
@@ -772,6 +844,7 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
             "%s"
             "<tr><th class=table-left>Durchschnitt für %d Monate</th><th class=table-right-currency></th><th class=table-right-currency></th><th class=table-right-currency>%s</th></tr>"
             "</table>") % (s, aAnzahl, T.sDM(aSumme))
+
 
   def htmlAlleMonateEinkommen(self):
     aAnzahl, aSumme, ea = self.listeAlleMonateEinkommen()
@@ -795,6 +868,7 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
             "<tr><th class=table-left>Durchschnitt für %d Monate</th><th class=table-right-currency></th><th class=table-right-currency></th><th class=table-right-currency>%s</th></tr>"
             "</table>") % (s, aAnzahl, T.sDM(aSumme))
 
+
   def getProjekt_ID(self, aKurz):
     aSQL = "SELECT MAX(ID) FROM KO_KUBPROJEKT P WHERE P.KURZ='%s'"
     aSQL = aSQL % (aKurz)
@@ -809,8 +883,10 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
         else:
           return 0
 
+
   def getProjekt_ID_Wintergarten_2017(self):
     return self.getProjekt_ID('Wintergarten 2017')
+
 
   def htmlProjekt(self, aProjekt_ID):
     aSumme, ea = self.listeProjekt(aProjekt_ID)
@@ -827,6 +903,7 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
             "<tr><th class=table-3c-spalte1></th><th class=table-3c-spalte2>Summe</th><th class=table-3c-spalte3>%s</th></tr>"
             "</table>") % (s, T.sDM(aSumme))
 
+
   def htmlProjektK(self, aProjekt_ID):
     aSumme, ea = self.listeProjektK(aProjekt_ID)
     s = ''
@@ -842,9 +919,11 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
             "<tr><th class=table-3c-spalte1></th><th class=table-3c-spalte2>Summe</th><th class=table-3c-spalte3>%s</th></tr>"
             "</table>") % (s, T.sDM(aSumme))
 
+
   def htmlProjektWintergarten2017(self):
     aProjekt_ID = self.getProjekt_ID_Wintergarten_2017()
     return self.htmlProjekt(aProjekt_ID)
+
 
   def htmlProjektWintergarten2017K(self):
     aProjekt_ID = self.getProjekt_ID_Wintergarten_2017()
@@ -853,6 +932,8 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
 
 def main():
   k = dmKonten()
+  # print(k.chartjsAlleMonateEinkommen())
+  print(k.chartjsAlleJahreEinkommen())
   # print k.summeAlleKonten()
   # print k.listeAlleKonten()
   # print (k.listeAlleMonateEinkommen())
@@ -871,7 +952,7 @@ def main():
   # k.diagrammKostenartVonBis('/wnfdaten/wnfpython/wnfportal/trunk/src/wnfportal/m/diagramme/', 'kreis_2018_09',
   #                          '01.09.2018', '30.09.2018')
   # k.diagrammAlleJahreEA('/wnfdaten/wnfpython/wnfportal/trunk/src/wnfportal/m/diagramme/diagramm_alle_jahre.png')
-  #k.diagrammAlleJahreEinkommen(
+  # k.diagrammAlleJahreEinkommen(
   #  '/wnfdaten/wnfpython/wnfportal/trunk/src/wnfportal/m/diagramme/diagramm_alle_jahre_ek.png')
   return 0
 

@@ -35,32 +35,35 @@
   <div class="logo-text">{{title}}</div>
 </div>
 <hr/>
-<hr/>
 <h1>{{Ueberschrift}}</h1>
 
 <canvas id="myChart"></canvas>
 <script>
   var ctx = document.getElementById('myChart').getContext('2d');
+  		var barChartData = {
+			labels: [{{!Labels}}],
+			datasets: [{
+				label: 'Einkommen Uwe',
+				backgroundColor: '#4dc9f6',
+				data: [{{EKU}}]
+			}, {
+				label: 'Einkommen Sabine',
+				backgroundColor: '#f67019',
+				data: [{{EKS}}]
+			}]
+		};
   var chart = new Chart(ctx, {
     // The type of chart we want to create
     type: 'bar',
-
     // The data for our dataset
-    data: {
-        labels: [{{!Labels}}],
-        datasets: [{
-            label: 'My First dataset',
-            backgroundColor: 'rgb(255, 99, 132)',
-            borderColor: 'rgb(255, 99, 132)',
-            data: [{{Data}}]
-        }]
-    },
-
+    data: barChartData,
     // Configuration options go here
     options: {
-      scales: {yAxes: [{ticks: {beginAtZero: true}}]}
+      scales: {yAxes: [{stacked: true}], xAxes: [{stacked: true}]}
     }
   });
 
+
 </script>
+<hr/>
 </body>
