@@ -576,6 +576,20 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
       aSumme = aSumme / aAnzMonate
     return aAnzMonate, aSumme, ea
 
+  def openKontoverlauf(self):
+    aSQL = """
+            SELECT 
+            EXTRACT(YEAR FROM E.DATUM) AS JAHR,
+            EXTRACT(MONTH FROM E.DATUM) AS MONAT,
+            SUM(E.BETRAG)
+            FROM KO_KUBEA E
+            WHERE E.IGNORIEREN = 0
+            GROUP BY EXTRACT(YEAR FROM E.DATUM),EXTRACT(MONTH FROM E.DATUM)
+            ORDER BY 1,2
+          """
+    # print(aSQL)
+    return self.sqlOpen(aSQL)
+
   def openAlleMonateEinkommen(self):
     aSQL = """
             SELECT 
@@ -613,7 +627,41 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
     # print(aSQL)
     return self.sqlOpen(aSQL)
 
-
+  def chartjsKontoverlauf(self):
+    aLabels = ''
+    aDaten = ''
+    # alle Monate
+    aSQL = 'SELECT MIN(E.DATUM),MAX(E.DATUM) FROM KO_KUBEA E'
+    cur = self.sqlOpen(aSQL)
+    if (cur == None):
+      return aLabels, aDaten
+    for row in cur:
+      aVon = row[0]
+      aBis = row[1]
+    while (aVon < aBis):
+      aVon = T.ersterNaechsterMonat(aVon)
+      # print(aVon)
+      aSQL = """
+            SELECT
+            SUM(E.BETRAG)
+            FROM KO_KUBEA E 
+            WHERE E.DATUM < '%s'
+            """ % (aVon)
+      # print(aSQL)
+      cur = self.sqlOpen(aSQL)
+      if (cur == None):
+        return aLabels, aDaten
+      for row in cur:
+        betrag = row[0]
+        s = aVon.strftime("%m/%Y")
+        print(s)
+        if aLabels!='':
+          aLabels = aLabels + ', '
+        aLabels = ("%s'%s'") % (aLabels,s)
+        if aDaten != '':
+          aDaten = aDaten + ', '
+        aDaten = ("%s %s") % (aDaten,betrag)
+    return aLabels, aDaten
 
   def chartjsAlleMonateEinkommen(self):
     """
@@ -933,7 +981,7 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
 def main():
   k = dmKonten()
   # print(k.chartjsAlleMonateEinkommen())
-  print(k.chartjsAlleJahreEinkommen())
+  print(k.chartjsKontoverlauf())
   # print k.summeAlleKonten()
   # print k.listeAlleKonten()
   # print (k.listeAlleMonateEinkommen())

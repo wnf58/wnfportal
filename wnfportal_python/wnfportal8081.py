@@ -90,7 +90,7 @@ class wnfPortal(object):
       "  <li><a href=einkommenAlleJahre>Einkommen alle Jahre</a></li>"
       "  <li><a href=kontostandLetzterMonat>Kontostand Letzter Monat</a></li>"
       "  <li><a href=projektWintergarten2017>Projekt Wintergarten 2017</a></li>"
-      "  <li><a href=diagrammKontoVerlauf>Diagramm Kontoverlauf</a></li>"
+      "  <li><a href=chartKontoVerlauf>Diagramm Kontoverlauf</a></li>"
       "  <li><a href=diagrammLetzterMonat>Diagramm letzter Monat</a></li>"
       "  <li><a href=diagrammLetzte12Monate>Diagramm letzte 12 Monate</a></li>"
       "  <li><a href=diagrammDieserMonat>Diagramm dieser Monat</a></li>"
@@ -133,7 +133,7 @@ class wnfPortal(object):
   kontostandAlleMonate.exposed = True
 
   def charttpl(self,aUeberschrift,aLabels,aEKU,aEKS):
-    print(aLabels)
+    #print(aLabels)
     aCaption = aUeberschrift
     output = template('chart.tpl',
                       title=aCaption,
@@ -185,6 +185,19 @@ class wnfPortal(object):
     return output
 
   diagrammKontoVerlauf.exposed = True
+
+  def chartKontoVerlauf(self):
+    k = wnfportal_dm_konten.dmKonten()
+    aLabels,aDaten = k.chartjsKontoverlauf()
+    output = template('chart_linie',
+                      title='wnfPortal - Kontoverlauf',
+                      Ueberschrift='Kontoverlauf',
+                      Labels=aLabels,
+                      Daten=aDaten
+                      )
+    return output
+
+  chartKontoVerlauf.exposed = True
 
   def diagrammLetzte12Monate(self):
     k = wnfHTMLKopf('Ausgaben letzte 12 Monate', 'Ausgaben letzte 12 Monate')

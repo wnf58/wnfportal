@@ -32,34 +32,32 @@
 <body>
 <div class="bg-div">
   <a href="/index"><img class="logo-img" height="40" alt="wlsoft-logo" src="/img/wnfPortal.png"/></a>
-  <div class="logo-text">{{title}}</div>
+  <div class="logo-text">{{Ueberschrift}}</div>
 </div>
 <hr/>
-<h1>{{Ueberschrift}}</h1>
-
 <canvas id="myChart"></canvas>
 <script>
   var ctx = document.getElementById('myChart').getContext('2d');
-  		var barChartData = {
+  		var chartData = {
 			labels: [{{!Labels}}],
 			datasets: [{
-				label: 'Einkommen Uwe',
+				label: 'Kontoverlauf',
+				fill: false,
 				backgroundColor: '#4dc9f6',
-				data: [{{EKU}}]
-			}, {
-				label: 'Einkommen Sabine',
-				backgroundColor: '#f67019',
-				data: [{{EKS}}]
+        borderWidth:1,
+        borderColor:'blue',
+        pointRadius: 0,
+				pointHoverRadius: 10,
+				data: [{{Daten}}]
 			}]
 		};
   var chart = new Chart(ctx, {
     // The type of chart we want to create
-    type: 'bar',
+    type: 'line',
     // The data for our dataset
-    data: barChartData,
+    data: chartData,
     // Configuration options go here
     options: {
-      scales: {yAxes: [{stacked: true}], xAxes: [{stacked: true}]}
     }
   });
 
