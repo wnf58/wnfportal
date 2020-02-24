@@ -68,7 +68,7 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
             WHERE E.DATUM >= %s
             ORDER BY E.DATUM DESC,E.KURZ
           """
-    aSQL = aSQL % (T.wnfDateToSQL(T.wnfErsterTagVormonat()))
+    aSQL = aSQL % (T.wnfDateToSQL(T.wnfTagVorVor8Wochen()))
     print(aSQL)
     cur = self.sqlOpen(aSQL)
     if (cur == None):
@@ -128,7 +128,7 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
             LEFT JOIN KO_KUBKAT K ON K.ID=E.KAT_ID
             WHERE E.PROJEKT_ID = %d
             AND NOT E.KAT_ID IS NULL
-            GROUP BY K.ID,K.KURZ 
+            GROUP BY K.ID,K.KURZ
             ORDER BY 4,K.KURZ
           """
     aSQL = aSQL % (aProjekt_ID)
@@ -236,7 +236,7 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
 
   def jsonListKonten(self):
     aSQL = """
-            SELECT 
+            SELECT
               K.ID,
               MAX(E.DATUM),
               K.KURZ,
@@ -264,7 +264,7 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
 
   def jsonKontostandSumme(self):
     aSQL = """
-            SELECT 
+            SELECT
               SUM(E.BETRAG)
             FROM KO_KUBEA E
           """
@@ -288,6 +288,21 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
         s, datum, kurz, betrag)
     return ("<table>"
             "<tr><th class=table-3c-spalte1>Datum</th><th class=table-3c-spalte2>Bezeichnung</th><th class=table-3c-spalte3>Betrag</th></tr>"
+            "%s"
+            "<tr><th class=table-3c-spalte1></th><th class=table-3c-spalte2>Summe</th><th class=table-3c-spalte3>%s</th></tr>"
+            "</table>") % (s, T.sDM(aSumme))
+
+  def htmlEAMonatlich(self):
+    aSumme, ea = self.analyseEAMonatlich()
+    s = ''
+    for l in ea:
+      kurz = l['kurz']  # .encode('utf-8')
+      betrag = l['betrag']
+      durchschnitt = l['durchschnitt']
+      s = '%s <tr><td class=table-3c-spalte1>%s</td><td class=table-3c-spalte3>%.2f</td><td class=table-3c-spalte3>%.2f</td></tr>' % (
+        s, kurz, betrag, durchschnitt)
+    return ("<table>"
+            "<tr><th class=table-3c-spalte1>Bezeichnung</th><th class=table-3c-spalte3>Betrag</th><th class=table-3c-spalte3>Durchschnitt</th></tr>"
             "%s"
             "<tr><th class=table-3c-spalte1></th><th class=table-3c-spalte2>Summe</th><th class=table-3c-spalte3>%s</th></tr>"
             "</table>") % (s, T.sDM(aSumme))
@@ -352,7 +367,7 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
       aSQL = """
             SELECT
             SUM(E.BETRAG)
-            FROM KO_KUBEA E 
+            FROM KO_KUBEA E
             WHERE E.DATUM < '%s'
             """ % (aVon)
       # print(aSQL)
@@ -375,8 +390,8 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
             SELECT
             EXTRACT(YEAR FROM E.DATUM) AS JAHR,
             SUM(E.BETRAG),
-            SUM(CASE WHEN E.BETRAG > 0 THEN E.BETRAG END) AS Einnahme, 
-            SUM(CASE WHEN E.BETRAG < 0 THEN E.BETRAG END) AS Ausgabe 
+            SUM(CASE WHEN E.BETRAG > 0 THEN E.BETRAG END) AS Einnahme,
+            SUM(CASE WHEN E.BETRAG < 0 THEN E.BETRAG END) AS Ausgabe
             FROM KO_KUBEA E
             WHERE E.IGNORIEREN = 0
             GROUP BY EXTRACT(YEAR FROM E.DATUM)
@@ -406,7 +421,7 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
 
   def listeKostenartVonBis(self, aVon, aBis):
     aSQL = """
-      SELECT ABS(SUM(E.BETRAG)),K.KURZ,K.ID 
+      SELECT ABS(SUM(E.BETRAG)),K.KURZ,K.ID
       FROM KO_KUBEA E
       LEFT JOIN KO_KUBKST K ON K.ID=E.KST_ID
       WHERE E.IGNORIEREN = 0
@@ -443,7 +458,7 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
 
   def analyseAusgabenVonBis10Prozent(self, aKst_ID, aKst_Kurz, aVon, aBis, a10Prozent):
     aSQL = """
-        SELECT SUM(ABS(E.BETRAG)),K.KURZ,K.ID 
+        SELECT SUM(ABS(E.BETRAG)),K.KURZ,K.ID
         FROM KO_KUBEA E
         LEFT JOIN KO_KUBKAT K ON K.ID=E.KAT_ID
         WHERE E.IGNORIEREN = 0
@@ -484,7 +499,7 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
     Alle EA bis 10 % zusammenfassen
     """
     aSQL = """
-      SELECT ABS(SUM(E.BETRAG)),K.KURZ,K.ID 
+      SELECT ABS(SUM(E.BETRAG)),K.KURZ,K.ID
       FROM KO_KUBEA E
       LEFT JOIN KO_KUBKST K ON K.ID=E.KST_ID
       WHERE E.IGNORIEREN = 0
@@ -538,6 +553,50 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
     self.closeConnection()
     return aSumme, ea, kst, aRecord
 
+  def analyseEAMonatlich(self):
+    """
+    Alle EA mit Monatlich <> 0 zusammenfassen
+    """
+    aSQL = """
+      SELECT SUM(E.BETRAG),K.KURZ,K.ID,E.MONATLICH,COUNT(*)
+      FROM KO_KUBEA E
+      LEFT JOIN KO_KUBKST K ON K.ID=E.KST_ID
+      WHERE E.IGNORIEREN = 0
+      AND E.MONATLICH <> 0
+      AND NOT E.KST_ID IS NULL
+      GROUP BY K.KURZ,K.ID,E.MONATLICH
+      ORDER BY 2
+      """
+    aSQL = """
+      SELECT ABS(SUM(E.BETRAG)),E.KURZ,E.MONATLICH,COUNT(*)
+      FROM KO_KUBEA E
+      WHERE E.IGNORIEREN = 0
+      AND E.MONATLICH <> 0
+      AND E.BETRAG<0
+      GROUP BY E.KURZ,E.MONATLICH
+      ORDER BY 1,2
+      """
+    print(aSQL)
+    cur = self.sqlOpen(aSQL)
+    if (cur == None):
+      return 0, [], [], []
+    aRecord = []
+    aSumme = 0
+    for row in cur:
+      # s = "%s | %20s" % (row[0], T.sDM(row[1]))
+      # print s
+      aDurchschnitt = row[0] / row[2] / row[3]
+      k = {'betrag': row[0],
+           'kurz': row[1],
+           'monatlich': row[2],
+           'anzahl': row[3],
+           'durchschnitt': aDurchschnitt
+           }
+      aSumme = aSumme + aDurchschnitt
+      # print(aSumme, k)
+      aRecord.append(k)
+    return aSumme, aRecord
+
   def listeAlleMonateEA(self):
     aSumme = 0
     aAnzMonate = 0
@@ -546,8 +605,8 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
             EXTRACT(YEAR FROM E.DATUM) AS JAHR,
             EXTRACT(MONTH FROM E.DATUM) AS MONAT,
             SUM(E.BETRAG),
-            SUM(CASE WHEN E.BETRAG > 0 THEN E.BETRAG END) AS Einnahme, 
-            SUM(CASE WHEN E.BETRAG < 0 THEN E.BETRAG END) AS Ausgabe 
+            SUM(CASE WHEN E.BETRAG > 0 THEN E.BETRAG END) AS Einnahme,
+            SUM(CASE WHEN E.BETRAG < 0 THEN E.BETRAG END) AS Ausgabe
             FROM KO_KUBEA E
             WHERE E.IGNORIEREN = 0
             GROUP BY EXTRACT(YEAR FROM E.DATUM),EXTRACT(MONTH FROM E.DATUM)
@@ -578,7 +637,7 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
 
   def openKontoverlauf(self):
     aSQL = """
-            SELECT 
+            SELECT
             EXTRACT(YEAR FROM E.DATUM) AS JAHR,
             EXTRACT(MONTH FROM E.DATUM) AS MONAT,
             SUM(E.BETRAG)
@@ -592,13 +651,13 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
 
   def openAlleMonateEinkommen(self):
     aSQL = """
-            SELECT 
+            SELECT
             FIRST 240
             EXTRACT(YEAR FROM E.DATUM) AS JAHR,
             EXTRACT(MONTH FROM E.DATUM) AS MONAT,
             SUM(E.BETRAG),
-            SUM(CASE WHEN E.KAT_ID = 22 THEN E.BETRAG END) AS Uwe, 
-            SUM(CASE WHEN E.KAT_ID = 24 THEN E.BETRAG END) AS Sabine 
+            SUM(CASE WHEN E.KAT_ID = 22 THEN E.BETRAG END) AS Uwe,
+            SUM(CASE WHEN E.KAT_ID = 24 THEN E.BETRAG END) AS Sabine
             FROM KO_KUBEA E
             WHERE E.IGNORIEREN = 0
             AND E.BETRAG > 1000
@@ -612,11 +671,11 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
 
   def openAlleJahreEinkommen(self):
     aSQL = """
-            SELECT 
+            SELECT
             EXTRACT(YEAR FROM E.DATUM) AS JAHR,
             SUM(E.BETRAG),
-            SUM(CASE WHEN E.KAT_ID = 22 THEN E.BETRAG END) AS Uwe, 
-            SUM(CASE WHEN E.KAT_ID = 24 THEN E.BETRAG END) AS Sabine 
+            SUM(CASE WHEN E.KAT_ID = 22 THEN E.BETRAG END) AS Uwe,
+            SUM(CASE WHEN E.KAT_ID = 24 THEN E.BETRAG END) AS Sabine
             FROM KO_KUBEA E
             WHERE E.IGNORIEREN = 0
             AND E.KST_ID = 11
@@ -644,7 +703,7 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
       aSQL = """
             SELECT
             SUM(E.BETRAG)
-            FROM KO_KUBEA E 
+            FROM KO_KUBEA E
             WHERE E.DATUM < '%s'
             """ % (aVon)
       # print(aSQL)
@@ -655,12 +714,12 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
         betrag = row[0]
         s = aVon.strftime("%m/%Y")
         print(s)
-        if aLabels!='':
+        if aLabels != '':
           aLabels = aLabels + ', '
-        aLabels = ("%s'%s'") % (aLabels,s)
+        aLabels = ("%s'%s'") % (aLabels, s)
         if aDaten != '':
           aDaten = aDaten + ', '
-        aDaten = ("%s %s") % (aDaten,betrag)
+        aDaten = ("%s %s") % (aDaten, betrag)
     return aLabels, aDaten
 
   def chartjsAlleMonateEinkommen(self):
@@ -676,15 +735,15 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
     if (cur == None):
       return aLabels, aEKU, aEKS
     for row in cur:
-      if aLabels!='':
+      if aLabels != '':
         aLabels = ', ' + aLabels
-      aLabels = ("'%s/%s'%s") % (row[1],row[0],aLabels)
+      aLabels = ("'%s/%s'%s") % (row[1], row[0], aLabels)
       if aEKU != '':
         aEKU = ', ' + aEKU
-      aEKU = ("%s %s") % (row[3],aEKU)
+      aEKU = ("%s %s") % (row[3], aEKU)
       if aEKS != '':
         aEKS = ', ' + aEKS
-      aEKS = ("%s %s") % (row[4],aEKS)
+      aEKS = ("%s %s") % (row[4], aEKS)
     return aLabels, aEKU, aEKS
 
   def chartjsAlleJahreEinkommen(self):
@@ -700,15 +759,15 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
     if (cur == None):
       return aLabels, aEKU, aEKS
     for row in cur:
-      if aLabels!='':
+      if aLabels != '':
         aLabels = ', ' + aLabels
-      aLabels = ("'%s'%s") % (row[0],aLabels)
+      aLabels = ("'%s'%s") % (row[0], aLabels)
       if aEKU != '':
         aEKU = ', ' + aEKU
-      aEKU = ("%s %s") % (row[2],aEKU)
+      aEKU = ("%s %s") % (row[2], aEKU)
       if aEKS != '':
         aEKS = ', ' + aEKS
-      aEKS = ("%s %s") % (row[3],aEKS)
+      aEKS = ("%s %s") % (row[3], aEKS)
     return aLabels, aEKU, aEKS
 
   def listeAlleMonateEinkommen(self):
@@ -736,7 +795,6 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
       aSumme = aSumme / aAnzMonate
     return aAnzMonate, aSumme, ea
 
-
   def diagrammKostenartVonBis(self, aPfad, aDateiname, aData, aLabels):
     d = Drawing(800, 800)
     pie = Pie()
@@ -750,7 +808,6 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
     # pie.slices[3].popout = 20
     d.add(pie)
     d.save(formats=['png'], outDir=aPfad, fnRoot=aDateiname)
-
 
   def diagrammAlleJahreEA(self, aPngDateiname):
     # Festlegen der Gesamtgröße in Pixel
@@ -793,7 +850,6 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
     print(aPngDateiname)
     renderPM.drawToFile(d, aPngDateiname, 'PNG')
 
-
   def diagrammAlleMonateEinkommen(self, aPngDateiname):
     # Festlegen der Gesamtgröße in Pixel
     d = Drawing(800, 600)
@@ -835,12 +891,10 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
     print(aPngDateiname)
     renderPM.drawToFile(d, aPngDateiname, 'PNG')
 
-
   def jsonAlleJahreEA(self):
     aSumme, ea = self.listeAlleJahreEA()
     j = {'summe': T.sDM(aSumme), 'ea': ea}
     return j
-
 
   def htmlAlleJahreEA(self):
     aAnzahl, aSumme, ea = self.listeAlleJahreEA()
@@ -870,7 +924,6 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
             "<tr><th class=table-left>Durchschnitt</th><th class=table-right-currency>%s</th></tr>"
             "</table>") % (s, T.sDM(aSumme))
 
-
   def htmlAlleMonateEA(self):
     aAnzahl, aSumme, ea = self.listeAlleMonateEA()
     s = ''
@@ -892,7 +945,6 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
             "%s"
             "<tr><th class=table-left>Durchschnitt für %d Monate</th><th class=table-right-currency></th><th class=table-right-currency></th><th class=table-right-currency>%s</th></tr>"
             "</table>") % (s, aAnzahl, T.sDM(aSumme))
-
 
   def htmlAlleMonateEinkommen(self):
     aAnzahl, aSumme, ea = self.listeAlleMonateEinkommen()
@@ -916,7 +968,6 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
             "<tr><th class=table-left>Durchschnitt für %d Monate</th><th class=table-right-currency></th><th class=table-right-currency></th><th class=table-right-currency>%s</th></tr>"
             "</table>") % (s, aAnzahl, T.sDM(aSumme))
 
-
   def getProjekt_ID(self, aKurz):
     aSQL = "SELECT MAX(ID) FROM KO_KUBPROJEKT P WHERE P.KURZ='%s'"
     aSQL = aSQL % (aKurz)
@@ -931,10 +982,8 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
         else:
           return 0
 
-
   def getProjekt_ID_Wintergarten_2017(self):
     return self.getProjekt_ID('Wintergarten 2017')
-
 
   def htmlProjekt(self, aProjekt_ID):
     aSumme, ea = self.listeProjekt(aProjekt_ID)
@@ -951,7 +1000,6 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
             "<tr><th class=table-3c-spalte1></th><th class=table-3c-spalte2>Summe</th><th class=table-3c-spalte3>%s</th></tr>"
             "</table>") % (s, T.sDM(aSumme))
 
-
   def htmlProjektK(self, aProjekt_ID):
     aSumme, ea = self.listeProjektK(aProjekt_ID)
     s = ''
@@ -967,11 +1015,9 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
             "<tr><th class=table-3c-spalte1></th><th class=table-3c-spalte2>Summe</th><th class=table-3c-spalte3>%s</th></tr>"
             "</table>") % (s, T.sDM(aSumme))
 
-
   def htmlProjektWintergarten2017(self):
     aProjekt_ID = self.getProjekt_ID_Wintergarten_2017()
     return self.htmlProjekt(aProjekt_ID)
-
 
   def htmlProjektWintergarten2017K(self):
     aProjekt_ID = self.getProjekt_ID_Wintergarten_2017()
@@ -980,8 +1026,10 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
 
 def main():
   k = dmKonten()
+  # k.analyseEAMonatlich()
+  print(k.htmlEAMonatlich())
   # print(k.chartjsAlleMonateEinkommen())
-  print(k.chartjsKontoverlauf())
+  # print(k.chartjsKontoverlauf())
   # print k.summeAlleKonten()
   # print k.listeAlleKonten()
   # print (k.listeAlleMonateEinkommen())

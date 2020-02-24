@@ -84,11 +84,12 @@ class wnfPortal(object):
       "<h2>Finanzen</h2>"
       "<ul>"
       "  <li><a href=kontostand>Kontostand</a></li>"
+      "  <li><a href=kontostandLetzterMonat>E/A Letzter Monat</a></li>"
+      "  <li><a href=eaMonatlich>E/A Statistik monatlich</a></li>"
       "  <li><a href=kontostandAlleJahre>Kontostand alle Jahre</a></li>"
       "  <li><a href=kontostandAlleMonate>Kontostand alle Monate</a></li>"
       "  <li><a href=einkommenAlleMonate>Einkommen alle Monate</a></li>"
       "  <li><a href=einkommenAlleJahre>Einkommen alle Jahre</a></li>"
-      "  <li><a href=kontostandLetzterMonat>Kontostand Letzter Monat</a></li>"
       "  <li><a href=projektWintergarten2017>Projekt Wintergarten 2017</a></li>"
       "  <li><a href=chartKontoVerlauf>Diagramm Kontoverlauf</a></li>"
       "  <li><a href=diagrammLetzterMonat>Diagramm letzter Monat</a></li>"
@@ -166,6 +167,14 @@ class wnfPortal(object):
     return "%s%s%s" % (k, b, f)
 
   kontostandLetzterMonat.exposed = True
+
+  def eaMonatlich(self):
+    k = wnfHTMLKopf('E/A monatlich', 'E/A monatlich')
+    b = self.q.konten_ea_monatlich_html()
+    f = wnfHTMLFuss()
+    return "%s%s%s" % (k, b, f)
+
+  eaMonatlich.exposed = True
 
   def diagrammLetzterMonat(self):
     k = wnfHTMLKopf('Ausgaben letzter Monat', 'Ausgaben letzter Monat')

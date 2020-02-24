@@ -49,6 +49,9 @@ def wnfLetzterDieserMonat():
 def wnfLetzterTagVormonat():
   return wnfErsterDieserMonat() - timedelta(1)
 
+def wnfTagVorVor8Wochen():
+  return wnfHeute() - timedelta(56)
+
 
 def ersterNaechsterMonat(d):
   d = d.replace(day=1)
