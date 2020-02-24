@@ -40,3 +40,8 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+/wnfportal_python/m/diagramme/test-pie.pdf
+/wnfportal_python/www/daten/kontoverlauf.csv
+/wnfportal_python/www/img/kreis_12Monate.png
+/wnfportal_python/www/img/kreis_diesermonat.png
+Würde wnfportal_python/__pycache__/ löschen
