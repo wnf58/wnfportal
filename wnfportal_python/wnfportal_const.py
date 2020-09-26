@@ -1,0 +1,2 @@
+PROGNAME = 'wnfPortal'
+PROGBUILD = 1000

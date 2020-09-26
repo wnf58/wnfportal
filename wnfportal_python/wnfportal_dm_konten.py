@@ -13,8 +13,6 @@ from reportlab.graphics.charts.barcharts import VerticalBarChart
 from reportlab.graphics.charts.piecharts import Pie
 from reportlab.graphics import renderPM
 
-import altair as alt
-
 
 class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
   def __init__(self):
@@ -59,6 +57,7 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
   def jsonAlleKonten(self):
     j = {'summe': T.sDM(self.summeAlleKonten()), 'konten': self.listeAlleKonten()}
     return j
+
 
   def listeLetzteEA(self):
     aSumme = 0
@@ -618,8 +617,8 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
       return aAnzMonate, aSumme, []
     ea = []
     for row in cur:
-      s = "%s | %20s" % (row[0], T.sDM(row[1]))
-      # print s
+      s = "%s/%s | %20s" % (row[0],row[1], T.sDM(row[2]))
+      # print(s)
       k = {'jahr': row[0],
            'monat': row[1],
            'betrag': row[2],
@@ -629,7 +628,7 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
            }
       aSumme = aSumme + row[1]
       aAnzMonate = aAnzMonate + 1
-      # print k
+      # print(k)
       ea.append(k)
     if aAnzMonate > 0:
       aSumme = aSumme / aAnzMonate
@@ -926,8 +925,10 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
 
   def htmlAlleMonateEA(self):
     aAnzahl, aSumme, ea = self.listeAlleMonateEA()
+    # print(type(ea))
     s = ''
     for l in ea:
+      # print(l)
       monat = "%2d/%d" % (l['monat'], l['jahr'])
       betrag = l['betrag']
       sSaldo = l['sDM']
@@ -938,10 +939,17 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
       else:
         aKlasse = 'class=table-right-currency'
       # print type(konto),konto
-      s = '%s <tr><td class=table-left>%s</td><td class=table-right-currency>%s</td><td class=table-right-currency>%s</td><td %s>%s</td></tr>' % (
-        s, monat, sDME, sDMA, aKlasse, sSaldo)
+      sDME = '<a href="monatea/%d/%d/">%s</a>' % (l['jahr'], l['monat'], sDME)
+      s = '%s <tr>' \
+          '<td class=table-left>%s</td>' \
+          '<td %s>%s</td>' \
+          '<td class=table-right-currency>%s</td>' \
+          '<td class=table-right-currency>%s</td>' \
+          '</tr>' \
+          % (s, monat, aKlasse, sSaldo, sDME, sDMA)
+    # print(s)
     return ("<table>"
-            "<tr><th class=table-left>Monat</th><th class=table-right-currency>Einnahmen</th><th class=table-right-currency>Ausgaben</th><th class=table-right-currency>Saldo</th></tr>"
+            "<tr><th class=table-left>Monat</th><th class=table-right-currency>Saldo</th><th class=table-right-currency>Einnahmen</th><th class=table-right-currency>Ausgaben</th></tr>"
             "%s"
             "<tr><th class=table-left>Durchschnitt für %d Monate</th><th class=table-right-currency></th><th class=table-right-currency></th><th class=table-right-currency>%s</th></tr>"
             "</table>") % (s, aAnzahl, T.sDM(aSumme))
@@ -1027,7 +1035,7 @@ class dmKonten(wnfportal_dm_datenbank.dmDatenbank):
 def main():
   k = dmKonten()
   # k.analyseEAMonatlich()
-  print(k.htmlEAMonatlich())
+  print(k.htmlAlleMonateEA())
   # print(k.chartjsAlleMonateEinkommen())
   # print(k.chartjsKontoverlauf())
   # print k.summeAlleKonten()

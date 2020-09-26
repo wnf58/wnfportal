@@ -72,13 +72,22 @@ class dmDatenbank(object):
     self.Con.close()
     self.Verbunden = False
 
+  def listTabelleAsRows(self,aSQL):
+    if not self.isVerbunden():
+      return None
+    cur = self.Con.cursor()
+    if not cur:
+      return None
+    cur.execute(aSQL)
+    return cur.fetchall()
+
 
 def main():
   d = dmDatenbank()
   d.setIniDatei('wnfKontakt.ini')
   if (d.isVerbunden()):
     aSQL = """
-          SELECT COUNT(*) FROM KO_TERMIN T 
+          SELECT COUNT(*) FROM KO_TERMIN T
           """
     print(d.sqlCount(aSQL))
   return 0

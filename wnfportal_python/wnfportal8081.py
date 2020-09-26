@@ -12,7 +12,6 @@ import os
 import cherrypy
 import json
 from bottle import template
-from pygments.lexers import _automodule
 
 from wnfportal_dm import object_q
 import wnfportal_dm_konten
